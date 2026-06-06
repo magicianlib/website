@@ -20,7 +20,7 @@
 <details open>
 <summary>**什么是仓库 id？**</summary>
 
-```xml title="settings.xml" {7,12}
+```xml title="settings.xml" {7,13}
 <settings>
     <profiles>
         <profile>
