@@ -32,7 +32,7 @@ kafka-topics.sh \
     --partitions <num>
 ```
 
-创建 topic 时指定分区数。topic 的一个分区同一时刻只能被一个消费者消费，也就是说当分区数越多，同一时刻被消费能力就越强。换句话说，分区数就是消费者并发数。
+创建 topic 时指定分区数。在同一个消费者组内，一个分区同一时刻只能被一个消费者消费，分区数越多，同一时刻能并发消费的能力就越强。换句话说，分区数就是消费者（组内）的并发上限。
 
 当生产者将消息投递到 topic 时，消息会被写入其中一个分区。至于写入哪个分区，则是根据消息 key 的 hash 值进行取模计算。也就是说当 key 设计得越合理，消息在分区中越呈现平均分布，消息越平均分布那并发能力就越强。
 
@@ -47,11 +47,11 @@ kafka-topics.sh \
     --replication-factor <num>
 ```
 
-replication-factor 用于指定分区同步副本数。当 topic 根据消息 key 路由将消息写入某个分区，该分区就是 Leader 副本。该配置用于指定分区总副本（备份）数，除了 Leader 副本，其他都是 Follower 副本。生产者将消息投递到 topic 后，首先会将消息写入 Leader 副本，之后再同步到 Follower 副本。
+replication-factor 用于指定分区的副本（备份）数。每个分区都有一个 Leader 副本负责接收读写请求，其余副本为 Follower 副本。该配置用于指定每个分区的总副本数，除了 Leader 副本，其他都是 Follower 副本。生产者将消息投递到 topic 时，会先将消息写入对应分区的 Leader 副本，之后再由 Leader 同步到各个 Follower 副本。
 
-这样能保证消息的高可用，即使 Leader 副本磁盘损坏，也能使用其他 Follower 副本代替。
+这样能保证消息的高可用，即使 Leader 副本所在节点宕机，也能由其他 Follower 副本顶上代替。
 
-**生产环境中建议至少副本 3 个副本。**
+**生产环境中建议至少设置 3 个副本。**
 
 ### --config min.insync.replicas=\<num>
 
@@ -95,15 +95,15 @@ kafka-topics.sh --create \
 `retention.ms` 的单位是 毫秒，这里设置 7天 只是便于理解。另外，-1 表示永久保存。
 :::
 
-### --config segment.bytes=\<bytes>
+### --config retention.bytes=\<bytes>
 
 ```bash
 kafka-topics.sh --create \
     --topic <topic_name> \
-    --config segment.bytes=1073741824
+    --config retention.bytes=1073741824
 ```
 
-控制 topic 日志大小，如果 topic 所有 segment 累计大小超过 `retention.bytes`，Kafka 会从最老的 segment 往前删。
+控制 topic 日志的总大小上限。如果某个分区所有 segment 的累计大小超过 `retention.bytes`，Kafka 会从最老的 segment 开始往前删。
 
 例如：
 
@@ -197,20 +197,18 @@ Kafka 不会看到 tombstone 就立即删对应的旧数据。它会先把 tombs
 
 ## 创建 topic
 
-通用的创建 topic 命令参数如下，可根据需要自行指定：
-
-了解过前面 topic 的主要配置之后，再去创建 topic 就得心应手了，通用的创建命令如下，可根据需要自行指定：
+了解过前面 topic 的主要配置之后，再去创建 topic 就得心应手了。通用的创建命令如下，可根据需要自行指定：
 
 ```bash
 kafka-topics.sh \
 --bootstrap-server [<broker:port>...] \
 --create \
 --topic <topic_name> \
---partitions <num> \                   # 分区数, 根据吞吐量评估, 通常至少为 3
---replication-factor <num> \           # 每个分区同步副本数, 生产环境建议至少为 3 个
---config min.insync.replicas=<num>     # 消息最小同步分区副本数, 保证高可用, 消息至少同步指定个副本, 才认为生产者消息投递 topic 成功, 建议至少 2 个
---config retention.ms=604800000 \      # 日志保留时长(7天), -1 表示永久保留
---config segment.bytes=1073741824      # 单日志分段最大大小(1GB)
+--partitions <num>                  \  # 分区数, 根据吞吐量评估, 通常至少为 3
+--replication-factor <num>          \  # 每个分区的副本数, 生产环境建议至少为 3 个
+--config min.insync.replicas=<num>  \  # 消息最小同步副本数, 保证高可用; 至少同步指定个副本才认为投递成功, 建议至少 2 个
+--config retention.ms=604800000     \  # 日志保留时长(7天), -1 表示永久保留
+--config segment.bytes=1073741824   \  # 单个日志分段的最大大小(1GB)
 --config cleanup.policy=delete         # 日志处理策略, 根据需求选择 delete 或 compact
 ```
 
@@ -235,11 +233,11 @@ WARNING: Due to limitations in metric names, topics with a period ('.') or under
 Created topic order.paid. <== topic 创建成功
 ```
 
-前面的 WARNING 并不是错误，而是 KAFKA 友善的提醒你：在创建 topic 时不要混用 `.` 和 `-`。
+前面的 WARNING 并不是错误，而是 Kafka 友善地提醒你：在创建 topic 时尽量不要混用 `.` 和 `_`。
 
 这事源自 Kafka 的度量指标（metrics）名字会把 topic 名嵌进去，而早期某些系统会把 `.` 和 `_` 都当成同一个分隔符。
 
-也就是说创建 topic 时 `order.paid` 和 `order_paid` 可能会生成相同的 metric 名，造成“撞名”。这并不是什么错误，仅仅只是友善的提示你不要同时混用 `.` 和 `-`，尽量保持统一的命名规范。
+也就是说创建 topic 时 `order.paid` 和 `order_paid` 可能会生成相同的 metric 名，造成“撞名”。这并不是什么错误，仅仅只是友善地提示你不要同时混用 `.` 和 `_`，尽量保持统一的命名规范。
 
 ## 列出所有 topic
 
@@ -281,7 +279,7 @@ $ bin/kafka-topics.sh \
 ```
 
 :::danger[NOTE]
-如果是在生产环境中，千万不要轻易的使用 `--delete`。因此，当你的业务需要使用一个新 topic 时，在创建之前一定要合理的创建分区，同时循命名规范并仔细斟酌并再去创建有业务含义的 topic 名称。一旦创建，就不要轻易的删除。
+如果是在生产环境中，千万不要轻易使用 `--delete`。因此，当业务需要使用一个新 topic 时，在创建之前一定要合理规划分区数、遵循命名规范，仔细斟酌一个有业务含义的 topic 名称后再创建。一旦创建，就不要轻易删除。
 :::
 
 ## 关于 broker 配置说明
