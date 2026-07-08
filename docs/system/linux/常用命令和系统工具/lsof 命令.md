@@ -328,3 +328,49 @@ $ lsof -nP -i@127.0.0.1:8080
 --
 
 上面介绍的就是 `lsof` 工具的主要用法，基本上就满足我们日常开发工作的需要了，剩下的呢就不再过介绍了，感兴趣的可以使用 `man` 命令查阅或者直接面向 Google 编程~
+
+## 快捷脚本
+
+```bash
+# ── 配色说明 ──────────────────────────────────────────────────────
+# 现代极简风：图标 + 语义色文字标签，去掉色块（参考 cargo / npm / Vite）。
+# 24-bit 真彩色，低饱和、语义化：
+#   · 柔和红  #E5484D → ✘ Error
+#   · 静谧蓝  #3E63DD → ℹ Usage
+#   · 琥珀色  #F5A524 → 命令高亮
+_proc_usage() {
+    local RED='\033[1;38;2;229;72;77m'
+    local BLUE='\033[1;38;2;62;99;221m'
+    local AMBER='\033[38;2;245;165;36m'
+    local NC='\033[0m'
+    echo -e "\n${RED}✘ Error${NC}  请输入$2"
+    echo -e "${BLUE}ℹ Usage${NC}  ${AMBER}$1${NC}\n"
+}
+
+# 通过 PID 查看监听状态
+lsof_by_pid() {
+    [ -z "$1" ] && { _proc_usage "lsof_by_pid <PID>" "进程 ID (PID)"; return 1; }
+    lsof -nP -p "$1" | grep -E "COMMAND|LISTEN"
+}
+
+# 通过端口号查看监听状态
+lsof_by_port() {
+    [ -z "$1" ] && { _proc_usage "lsof_by_port <PORT>" "端口号 (PORT)"; return 1; }
+    lsof -nP -i :"$1" | grep -E "COMMAND|LISTEN"
+}
+```
+
+使用示例：
+
+```bash
+$ lsof_by_pid
+
+✘ Error  请输入进程 ID (PID)
+ℹ Usage  lsof_by_pid <PID>
+
+$ lsof_by_pid 69465
+COMMAND   PID     USER   FD      TYPE             DEVICE SIZE/OFF                NODE NAME
+java    69465 ituknown  217u     IPv6 0xba1e4f6ab901bd4f      0t0                 TCP *:50320 (LISTEN)
+java    69465 ituknown  366u     IPv6 0xba1e4f6ab89a2d4f      0t0                 TCP *:60661 (LISTEN)
+java    69465 ituknown  420u     IPv6 0xba1e4f6ab901554f      0t0                 TCP *:8319 (LISTEN)
+```
