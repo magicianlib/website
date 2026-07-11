@@ -216,7 +216,7 @@ if [ -d ~/.profile.d ]; then
 fi
 ```
 
-具体的拆分思路与加载方式见 [配置文件正确使用姿势](/system/linux/日常笔记/配置文件正确使用姿势)。
+具体的拆分思路与加载方式见 [配置文件正确使用姿势](/system/linux/Shell%20知识/配置文件正确使用姿势)。
 
 PowerShell 侧，把 `Proxy.ps1` 放进 `$PROFILE` 同目录下的 `ProfileScripts/`，由主配置文件 dot-source 加载：
 

@@ -9,7 +9,7 @@
 
 `ifconfig` 命令通常不是各Linux发行版自带的系统命令，如果你输入 `ifconfig` 命令后提示 “ifconfig: command not found” 即表示当前系统默认没有集成该工具包，想要使用该命令需要先安装工具包 `net-tools`。
 
-特别说明的一点是：在新的 Linux 发行版中，已经不推荐使用 `ifconfig` 命令进行网络管理，取而代之的是使用系统自带的 [ip](../网络设置/IP%20命令.md) 命令。
+特别说明的一点是：在新的 Linux 发行版中，已经不推荐使用 `ifconfig` 命令进行网络管理，取而代之的是使用系统自带的 [ip](./IP%20命令.md) 命令。
 
 在 Debian/Ubuntu 发行版中安装 `net-tools` 工具直接执行下面的命令即可：
 
