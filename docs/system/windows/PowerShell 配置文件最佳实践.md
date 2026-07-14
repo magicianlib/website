@@ -101,13 +101,13 @@ Get-ChildItem -Path $ConfigDir -Filter *.ps1 | ForEach-Object {
 **`Proxy.ps1`** —— 代理开关，一组带前缀的快捷命令：
 
 ```powershell
-function proxy_enable {
+function ProxyEnable {
     $env:HTTP_PROXY = "http://127.0.0.1:7897"
     $env:HTTPS_PROXY = "http://127.0.0.1:7897"
     Write-Host "Proxy ON (127.0.0.1:7897)" -ForegroundColor Green
 }
 
-function proxy_disable {
+function ProxyDisable {
     Remove-Item Env:HTTP_PROXY
     Remove-Item Env:HTTPS_PROXY
     Write-Host "Proxy OFF" -ForegroundColor Red
