@@ -65,7 +65,7 @@ export default function DocItemLayout({ children }: Props): ReactNode {
         <br />
         <Giscus
           id="comments"
-          repo="ituknown/website"
+          repo="magicianlib/website"
           repoId="R_kgDOQd0tew"
           category="General"
           categoryId="DIC_kwDOQd0te84Cza27"
