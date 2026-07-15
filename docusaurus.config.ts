@@ -27,7 +27,7 @@ const config: Config = {
     },
 
     // Set the production url of your site here
-    url: 'https://ituknown.github.io',
+    url: 'https://ituknown.org',
     // Set the /<baseUrl>/ pathname under which your site is served
     // For GitHub pages deployment, it is often '/<projectName>/'
     baseUrl: '/',
@@ -343,7 +343,7 @@ const config: Config = {
         algolia: {
             appId: 'S2Q2TJV9SH',
             apiKey: 'fc9d428f8815ca5b5b860b70f05d31de',
-            indexName: 'ituknown.github.io', // algolia 爬虫名称
+            indexName: 'ituknown', // algolia 爬虫名称
             contextualSearch: false, // 这里不能改
         },
         prism: {
