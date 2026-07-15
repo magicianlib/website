@@ -1,0 +1,46 @@
+name: Deploy Docusaurus to GitHub Pages Repo
+
+on:
+  push:
+    branches:
+      - main # 如果你的默认开发分支是 master，请改为 master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 拉取源仓库代码
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # 2. 安装 pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 11.4.0 # 或者指定具体的 pnpm 版本，如 9.x.x
+
+      # 3. 设置 Node.js 环境 (使用 24.11.1 并在 pnpm 模式下配置缓存)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.11.1" # 或者指定具其他版本
+          cache: "pnpm"
+
+      # 4. 安装依赖
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile # 使用 frozen-lockfile 确保依赖版本与 pnpm-lock.yaml 完全一致
+
+      # 5. 构建 Docusaurus 静态文件
+      - name: Build Website
+        run: pnpm run build
+
+      # 6. 将构建产物部署到目标仓库
+      - name: Deploy to Target Repo
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.DEPLOY_TOKEN }}
+          repository-name: ituknown/ituknown.github.io
+          branch: main # 目标仓库接收静态文件的分支
+          folder: build # Docusaurus 默认构建输出的目录
+          clean: true # 部署时自动清理目标分支中旧的多余文件
