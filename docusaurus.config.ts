@@ -343,7 +343,7 @@ const config: Config = {
         algolia: {
             appId: 'S2Q2TJV9SH',
             apiKey: 'fc9d428f8815ca5b5b860b70f05d31de',
-            indexName: 'ituknown_org', // algolia 爬虫名称
+            indexName: 'ituknown.github.io', // algolia 爬虫名称
             contextualSearch: false, // 这里不能改
         },
         prism: {
