@@ -245,6 +245,19 @@ const config: Config = {
                 rehypePlugins: [rehypeKatex],
             },
         ], [
+            // Excel 文档实例
+            '@docusaurus/plugin-content-docs',
+            {
+                id: 'excel',
+                path: 'docs/tools/excel',
+                routeBasePath: 'tools/excel',
+                sidebarPath: './sidebars/tools/excel.ts',
+                showLastUpdateTime: false,
+                onInlineTags: 'throw',
+                remarkPlugins: [remarkMath],
+                rehypePlugins: [rehypeKatex],
+            },
+        ], [
             // Rust 文档实例
             '@docusaurus/plugin-content-docs',
             {
@@ -448,6 +461,11 @@ const config: Config = {
                             sidebarId: 'protocol',
                             docsPluginId: 'protocol',
                             label: '🌍 Protocol',
+                        }, {
+                            type: 'docSidebar',
+                            sidebarId: 'excel',
+                            docsPluginId: 'excel',
+                            label: '📊 Excel',
                         },
                     ],
                 },
