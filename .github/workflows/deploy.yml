@@ -16,7 +16,7 @@ jobs:
 
       # 2. 安装 pnpm
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 11.4.0 # 或者指定具体的 pnpm 版本，如 9.x.x
 
