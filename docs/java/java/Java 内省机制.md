@@ -160,7 +160,7 @@ java.beans.EventSetDescriptor
 
 如下图：
 
-<img src="https://media.ituknown.org/java-media/Introspector/introspector_inheritance_relationship.png" alt="introspector_inheritance_relationship.png" width="650px" />
+<img src="https://@media/java-media/Introspector/introspector_inheritance_relationship.png" alt="introspector_inheritance_relationship.png" width="650px" />
 
 类 `Introspector` 通常是操作内省  API 的入口类，该类只有一个 “私有” 的构造方法：
 

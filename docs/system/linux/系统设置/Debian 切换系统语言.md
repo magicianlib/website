@@ -6,11 +6,11 @@ $1.$ 打开终端，输入命令 `sudo dpkg-reconfigure locales`
 
 $2.$ 在出现的界面中选择 `en_US.UTF-8` ，即英文语言设置。如果没有该选项，可以输入命令 `sudo locale-gen en_US.UTF-8` 添加。
 
-![dpkg-reconfigure-locales-MTcxMTUwNTYyOAo.png](https://media.ituknown.org/linux-media/ReconfigureLocales/dpkg-reconfigure-locales-MTcxMTUwNTYyOAo.png)
+![dpkg-reconfigure-locales-MTcxMTUwNTYyOAo.png](https://@media/linux-media/ReconfigureLocales/dpkg-reconfigure-locales-MTcxMTUwNTYyOAo.png)
 
 确认之后会进一步提示选择系统默认语言，这里选择
 
-![setting-default-locales-MTcxMTUwNTYxNgo.png](https://media.ituknown.org/linux-media/ReconfigureLocales/setting-default-locales-MTcxMTUwNTYxNgo.png)
+![setting-default-locales-MTcxMTUwNTYxNgo.png](https://@media/linux-media/ReconfigureLocales/setting-default-locales-MTcxMTUwNTYxNgo.png)
 
 $3.$ 如果上面语言设置完成之后没有提示选择系统默认语言，那么可以通过输入命令 `sudo update-locale LANG=en_US.UTF-8` 实现更新系统语言设置。
 

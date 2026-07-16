@@ -104,7 +104,7 @@ public interface BeanNameGenerator {
 
 而 `BeanNameGenerator` 接口有两个重要的实现类： `AnnotationBeanNameGenerator`  和 `DefaultBeanNameGenerator` 。除此之外，还有一个  `FullyQualifiedAnnotationBeanNameGenerator`，不过该类继承至 `AnnotationBeanNameGenerator` ，所以不做什么说明，现在看下类图：
 
-![](https://media.ituknown.org/spring-media/BeanNameGenerator/BeanNameGeneratorHierarchy.webp)
+![](https://@media/spring-media/BeanNameGenerator/BeanNameGeneratorHierarchy.webp)
 
 - `AnnotationBeanNameGenerator` ：用于基于注解形式Bean的名称生成策略类
 - `DefaultBeanNameGenerator` ：用于基于XML形式Bean的名称生成策略类
@@ -458,11 +458,11 @@ admin.print();
 
 如果你不知道 BeanName 生成的具体流程我们可以借助 IDE 功能来一步一步调试。比如我们知道了该接口后我们就完全可以查找该接口的实现类：
 
-![](https://media.ituknown.org/spring-media/BeanNameGenerator/BeanNameGeneratorImpl.webp)
+![](https://@media/spring-media/BeanNameGenerator/BeanNameGeneratorImpl.webp)
 
 找到实现类之后只需要大概浏览一下注释即可知道 XML 走的是 `DefaultBeanNameGenerator` 策略，注解走的是 `AnnotationBeanNameGenerator` 策略。然后再在重写的方法上进行 Debug 调试，查找调用链信息即可之上上一步、上上一步、上上上一步走的是哪一个方法，这样我们反向查找就能从开始一步一步走到这个方法，这一直走下来就是一个流程了。
 
-![](https://media.ituknown.org/spring-media/BeanNameGenerator/AnnotationBeanNameGeneratorDebug.webp)
+![](https://@media/spring-media/BeanNameGenerator/AnnotationBeanNameGeneratorDebug.webp)
 
 
 所以，学习 Spring 源码这也是一种方式啊🥳🥳🥳🥳

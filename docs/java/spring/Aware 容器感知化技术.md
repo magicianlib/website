@@ -41,7 +41,7 @@ public void doAware(T arg){
 
 在 Spring 框架中 `Aware` 是一个超接口，仅仅是用于标记。具体的应用是其子接口，比如： `BeanNameAware` 接口。下面这张图是 Spring 框架提供的所有的 `Aware` 子接口：
 
-![](https://media.ituknown.org/spring-media/Aware/AwareInterface.webp)
+![](https://@media/spring-media/Aware/AwareInterface.webp)
 
 很多时候，理解某一个接口或方法直接通过其命名即可理解。这也是在编码过程中非常重要的一项准则，如果你读读 Spring 源码，你会发现其命名跟诗一样。尽管很长，但是容易理解。
 

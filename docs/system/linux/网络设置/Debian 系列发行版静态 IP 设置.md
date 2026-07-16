@@ -73,7 +73,7 @@ $ ip -c addr show
 
 输出示例：
 
-![show-ip-1637739047LlljmB](https://media.ituknown.org/linux-media/NetworkManager/Debian-StaticIP/show-ip-1637739047LlljmB.png)
+![show-ip-1637739047LlljmB](https://@media/linux-media/NetworkManager/Debian-StaticIP/show-ip-1637739047LlljmB.png)
 
 可以看到我们的 IP 都是绑定在 `ens33` 网卡上的，上面截图中绑定的 IPv4 地址是 `172.17.13.167/24` ，IPv6 地址是 `fe80::20c:29ff:fe1b:a908/64` 。稍后我们就将 IPv4 或 IPv6 设置成静态的（每个系统上的网卡名可能不一样，我的是 `ens33` 你的可能是 `eth0` 。具体是什么可以使用 `ip -c route list` 命令查下）。
 
@@ -133,7 +133,7 @@ $ ip -c route list
 
 输出示例：
 
-![show-route-1637829825BkqF0Q](https://media.ituknown.org/linux-media/NetworkManager/Debian-StaticIP/show-route-1637829825BkqF0Q.png)
+![show-route-1637829825BkqF0Q](https://@media/linux-media/NetworkManager/Debian-StaticIP/show-route-1637829825BkqF0Q.png)
 
 其中 default 栏对应的 IP 就是我们的网关了，IP 是 `172.17.13.254` 。
 
@@ -264,7 +264,7 @@ $ ip -c addr show
 
 输出示例：
 
-![multiple-ip-1637832393lrIgXO](https://media.ituknown.org/linux-media/NetworkManager/Debian-StaticIP/multiple-ip-1637832393lrIgXO.png)
+![multiple-ip-1637832393lrIgXO](https://@media/linux-media/NetworkManager/Debian-StaticIP/multiple-ip-1637832393lrIgXO.png)
 
 现在再来看下如果发行版没有 `iproute2` 网络管理工具多静态 IP 该如何配置：
 
@@ -315,7 +315,7 @@ iface ens33:1 inet static
 
 在 [Debian 官网中有一篇对网络配置的介绍](https://wiki.debian.org/NetworkConfiguration)，其中就有介绍在 `/etc/network/interfaces` 配置文件中配置网卡 DNS 问题：
 
-![debian-nameservers-doc-1637928644Jv2CjN](https://media.ituknown.org/linux-media/NetworkManager/Debian-StaticIP/debian-nameservers-doc-1637928644Jv2CjN.png)
+![debian-nameservers-doc-1637928644Jv2CjN](https://@media/linux-media/NetworkManager/Debian-StaticIP/debian-nameservers-doc-1637928644Jv2CjN.png)
 
 总结下来就是在具体网卡后面写一个 `dns-nameservers` 的配置，与 `gateway` 和 `address` 一样需要有缩进，在后面写上 DNS 服务器的 IP 即可，示例如下：
 

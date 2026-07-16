@@ -29,7 +29,7 @@ $ runlevel
 下面是桌面版 Ubuntu 输出示例：
 ​
 
-![Ubuntu-Desktop-Default-Runlevel-1637546756qbfbg0](https://media.ituknown.org/linux-media/SystemManager/runlevels/Ubuntu-Desktop-Default-Runlevel-1637546756qbfbg0.png)
+![Ubuntu-Desktop-Default-Runlevel-1637546756qbfbg0](https://@media/linux-media/SystemManager/runlevels/Ubuntu-Desktop-Default-Runlevel-1637546756qbfbg0.png)
 
 注意看截图中的输出：
 
@@ -60,16 +60,16 @@ $ sudo telinit 3
 
 还是以我们当前的 GUI Ubuntu 为例，如下：
 
-![Ubuntu-Desktop-Change-Runlevel-1637546811zSwqNT](https://media.ituknown.org/linux-media/SystemManager/runlevels/Ubuntu-Desktop-Change-Runlevel-1637546811zSwqNT.png)
+![Ubuntu-Desktop-Change-Runlevel-1637546811zSwqNT](https://@media/linux-media/SystemManager/runlevels/Ubuntu-Desktop-Change-Runlevel-1637546811zSwqNT.png)
 
 当我们输入密码回车确认后就会立即进入命令行模式（即 Runleve3）：
 
-![linux-runlevel3-loginpage-1637546889GRM14C](https://media.ituknown.org/linux-media/SystemManager/runlevels/linux-runlevel3-loginpage-1637546889GRM14C.png)
+![linux-runlevel3-loginpage-1637546889GRM14C](https://@media/linux-media/SystemManager/runlevels/linux-runlevel3-loginpage-1637546889GRM14C.png)
 
 之后登录到系统，再次输入 `runlevel` 命令查看运行级别，你会得到如下输出：
 ​
 
-![linux-runlevel3-show-1637546934N1rSC4](https://media.ituknown.org/linux-media/SystemManager/runlevels/linux-runlevel3-show-1637546934N1rSC4.png)
+![linux-runlevel3-show-1637546934N1rSC4](https://@media/linux-media/SystemManager/runlevels/linux-runlevel3-show-1637546934N1rSC4.png)
 
 你看，这回不是 `N 3` 而是 `5  3` 了。记住，前面一个表示当前系统具有其他运行级别，后面一个表示当前用户的运行级别。另外，这仅仅是修改当前登录用户的运行级别，也就是说当我们重启（ `reboot` ）后就失效了~
 ​
@@ -148,7 +148,7 @@ $ systemctl get-default
 
 这个命令就会输出自己的运行单元，下面是桌面版 Ubuntu 输出示例：
 
-![systemctl-getdefault-1637547018eANBA9](https://media.ituknown.org/linux-media/SystemManager/runlevels/systemctl-getdefault-1637547018eANBA9.png)
+![systemctl-getdefault-1637547018eANBA9](https://@media/linux-media/SystemManager/runlevels/systemctl-getdefault-1637547018eANBA9.png)
 
 会发现当前系统默认的运行级别对应着 systemd 的 graphical.target 单元，也就是图形界面。
 
@@ -169,12 +169,12 @@ $ sudo ln -sf /lib/systemd/system/multi-user.target /etc/systemd/system/default.
 
 下面是 Ubuntu 桌面版执行示例：
 
-![systemctl-changeto-multiuser-1637547106uxVfrX](https://media.ituknown.org/linux-media/SystemManager/runlevels/systemctl-changeto-multiuser-1637547106uxVfrX.png)
+![systemctl-changeto-multiuser-1637547106uxVfrX](https://@media/linux-media/SystemManager/runlevels/systemctl-changeto-multiuser-1637547106uxVfrX.png)
 
 ​
 之后重启（ `reboot` ）重新登录就会发现编程了命令行模式了（注意看灰色框标识的命令）：
 
-![systemctl-multiuser-show-1637547120HUymZa](https://media.ituknown.org/linux-media/SystemManager/runlevels/systemctl-multiuser-show-1637547120HUymZa.png)
+![systemctl-multiuser-show-1637547120HUymZa](https://@media/linux-media/SystemManager/runlevels/systemctl-multiuser-show-1637547120HUymZa.png)
 
 ## initd 管理运行级别
 

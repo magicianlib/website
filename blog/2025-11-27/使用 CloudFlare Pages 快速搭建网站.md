@@ -80,7 +80,7 @@ npx create-docusaurus@latest website classic --typescript
 
 运行 `npm run start` 等待编译完成，在浏览器中打开 [http://localhost:3000/](http://localhost:3000/) 你会看到如下界面：
 
-![step_0_create_docusaurus](https://media.ituknown.org/blog-media/CloudFlarePages/step_0_create_docusaurus.png)
+![step_0_create_docusaurus](https://@media/blog-media/CloudFlarePages/step_0_create_docusaurus.png)
 
 现在一个简单的静态文档就生成好了~
 
@@ -92,11 +92,11 @@ npx create-docusaurus@latest website classic --typescript
 
 进入 CloudFlare Pages，你会看到如下界面：
 
-![step_1_choose_pages](https://media.ituknown.org/blog-media/CloudFlarePages/step_1_choose_pages.png)
+![step_1_choose_pages](https://@media/blog-media/CloudFlarePages/step_1_choose_pages.png)
 
 不要直接点击右侧的 **Create application** 按钮，该功能创建的是 Workers，并不是我们部署静态站点使用的 Pages。正确的姿势是依此点击 **Add** » **Pages**，接下来就会进入下图这个界面：
 
-![step_2_import_git](https://media.ituknown.org/blog-media/CloudFlarePages/step_2_import_git.png)
+![step_2_import_git](https://@media/blog-media/CloudFlarePages/step_2_import_git.png)
 
 此时有两个选择，直接上传静态文档或者从 Git 导入构建。如果你想直接上传，只需要将前面生成的 build 文件夹上传即可。不过这种每次做修改时都需要手动执行一次上传，简直不要太麻烦。
 
@@ -104,15 +104,15 @@ npx create-docusaurus@latest website classic --typescript
 
 接下来就需要关联自己的 Github 或 GitLab，根据自己上传的平台关联即可，关联成功后选择刚上传的项目：
 
-![step_3_select_repository](https://media.ituknown.org/blog-media/CloudFlarePages/step_3_select_repository.png)
+![step_3_select_repository](https://@media/blog-media/CloudFlarePages/step_3_select_repository.png)
 
 继续下一步，开始设置 Pages 项目名和要构建的分支。项目名随意即可，分支的话推荐使用主分支：
 
-![step_4_1_project_name](https://media.ituknown.org/blog-media/CloudFlarePages/step_4_1_project_name.png)
+![step_4_1_project_name](https://@media/blog-media/CloudFlarePages/step_4_1_project_name.png)
 
 继续向下，开始设置项目框架和构建命令（如下图）。CloudFlare 已经内置了所有主流的静态网站框架，你能想到的这里都有。我使用的是 [Docusaurus](https://docusaurus.io/) 所以我就选择该框架：
 
-![step_4_2_build_command](https://media.ituknown.org/blog-media/CloudFlarePages/step_4_2_build_command.png)
+![step_4_2_build_command](https://@media/blog-media/CloudFlarePages/step_4_2_build_command.png)
 
 构建命令使用 `npm run build` 或 `yarn run build` ，实际上 CloudFlare Pages 已经根据项目框架自动帮你填充了。输出目录就指定 build 即可，这是 Node.js 默认的输出目录。
 
@@ -120,21 +120,21 @@ npx create-docusaurus@latest website classic --typescript
 
 所有设置都填写完成后，就可以点击保存部署了：
 
-![step_5_deploy_log](https://media.ituknown.org/blog-media/CloudFlarePages/step_5_deploy_log.png)
+![step_5_deploy_log](https://@media/blog-media/CloudFlarePages/step_5_deploy_log.png)
 
 从构建日志中就可以看到使用了我们环境变量中配置的 Node.js 版本，构建完成后也就表示部署完成了。现在你就可以使用 CloudFlare 为你提供的域名访问你的静态站点了。
 
 如果你有自己的域名，并想为该 Pages 设置自己的域名，可以继续点击下方的 **Add custom domain**：
 
-![step_6_add_custom_domain](https://media.ituknown.org/blog-media/CloudFlarePages/step_6_add_custom_domain.png)
+![step_6_add_custom_domain](https://@media/blog-media/CloudFlarePages/step_6_add_custom_domain.png)
 
 直接点击 **Set up a custom domain**：
 
-![step_7_set_up_a_custom_domain](https://media.ituknown.org/blog-media/CloudFlarePages/step_7_set_up_a_custom_domain.png)
+![step_7_set_up_a_custom_domain](https://@media/blog-media/CloudFlarePages/step_7_set_up_a_custom_domain.png)
 
 接下来就可以填写自己的域名了：
 
-![step_8_input_custom_domain](https://media.ituknown.org/blog-media/CloudFlarePages/step_8_input_custom_domain.png)
+![step_8_input_custom_domain](https://@media/blog-media/CloudFlarePages/step_8_input_custom_domain.png)
 
 :::info[小提示]
 
@@ -144,7 +144,7 @@ npx create-docusaurus@latest website classic --typescript
 
 域名填写完成后还有一个激活步骤，点击激活即可：
 
-![step_9_activate_domain](https://media.ituknown.org/blog-media/CloudFlarePages/step_9_activate_domain.png)
+![step_9_activate_domain](https://@media/blog-media/CloudFlarePages/step_9_activate_domain.png)
 
 <details open>
 <summary>域名验证？</summary>
@@ -153,12 +153,12 @@ npx create-docusaurus@latest website classic --typescript
 
 但如果你的自定义域名还未迁移到 CloudFlare，此时需要按照下面的提示进入到你的域名服务商平台的管理页面，在域名 DNS 解析中添加一条 CNAME 记录。填写完成之后点击 **Check DNS Records**，如果信息无误，就完成激活验证了。
 
-![step_10_domain_verifying](https://media.ituknown.org/blog-media/CloudFlarePages/step_10_domain_verifying.png)
+![step_10_domain_verifying](https://@media/blog-media/CloudFlarePages/step_10_domain_verifying.png)
 
 </details>
 
 当激活成功之后就可以使用你的自定义域名访问网站了🎉🎉🎉🎉：
 
-![step_11_domain_activated](https://media.ituknown.org/blog-media/CloudFlarePages/step_11_domain_activated.png)
+![step_11_domain_activated](https://@media/blog-media/CloudFlarePages/step_11_domain_activated.png)
 
 接下来你提交到 Github 的任意变更都会触发 Pages 的自动构建，真是一劳永逸~

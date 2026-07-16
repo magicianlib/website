@@ -218,6 +218,6 @@ Jackson在反序列化处理Java8日期存在一些问题：
 
 当你尝试转换成 User 对象时会提示如下错误：
 
-![deserializationJava8DateFail1708509575.png](https://media.ituknown.org/java-media/jackson/deserializationJava8DateFail1708509575.png)
+![deserializationJava8DateFail1708509575.png](https://@media/java-media/jackson/deserializationJava8DateFail1708509575.png)
 
 归根结底，这是 Jackson 对 Java8 日期格式化得问题，解决方式见 [java.time 日期格式问题](./java.time%20日期格式问题.md)。

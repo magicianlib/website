@@ -18,7 +18,7 @@
 
 下载后进行解压：
 
-![ExtractJetBrainsMonoFonts-16499894323N4hvsXu](https://media.ituknown.org/linux-media/KnowledgeNotes/CustomFonts/ExtractJetBrainsMonoFonts-16499894323N4hvsXu.png)
+![ExtractJetBrainsMonoFonts-16499894323N4hvsXu](https://@media/linux-media/KnowledgeNotes/CustomFonts/ExtractJetBrainsMonoFonts-16499894323N4hvsXu.png)
 
 其实在官网已经进行了说明如何安装，只需要将解压的字体文件拷贝至 `~/.local/share/fonts`  目录或者  `/usr/share/fonts`  目录。其中前者是当前用户目录，后者是系统目录。系统目录意味着字体文件会对所有的系统用户生效，也是首选的安装方式。
 

@@ -3,8 +3,18 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeMediaBaseUrl from './src/plugins/rehype-media-base-url';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+
+// 图床域名 —— 换图床时只改这一行
+const MEDIA_BASE_URL = 'https://media.ituknown.org';
+
+// 共享 rehype 插件列表 (katex 公式 + 图床域名占位符替换), 各 docs 实例与 blog 共用
+const rehypePlugins: any[] = [
+    rehypeKatex,
+    [rehypeMediaBaseUrl, { token: 'https://@media', baseUrl: MEDIA_BASE_URL }],
+];
 
 const config: Config = {
     title: '笔记本',
@@ -77,7 +87,7 @@ const config: Config = {
                     blogSidebarCount: 'ALL', // 侧边栏显示 Blog 数量
                     showReadingTime: true, // 显示阅读时间
                     remarkPlugins: [remarkMath], // 启用 katex
-                    rehypePlugins: [rehypeKatex], // 启用 katex
+                    rehypePlugins, // katex 公式 + 图床域名替换
                     onInlineTags: 'throw', // 内联不存在的 TAG 直接抛出异常
                     onInlineAuthors: 'throw', // 内联不存在的作者 直接抛出异常
                     onUntruncatedBlogPosts: 'throw', // 如果文档没设置 <!-- truncate --> 直接抛出异常
@@ -125,7 +135,7 @@ const config: Config = {
                 showLastUpdateTime: false, // 最近更新时间
                 onInlineTags: 'throw', // 内联不存在的 TAG 直接抛出异常
                 remarkPlugins: [remarkMath], // 启用 katex
-                rehypePlugins: [rehypeKatex], // 启用 katex
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Linux 文档实例
@@ -138,7 +148,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Windows 文档实例
@@ -151,7 +161,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // MacOS 文档实例
@@ -164,7 +174,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Java 文档实例
@@ -177,7 +187,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Spring 文档实例
@@ -190,7 +200,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Kafka 文档实例
@@ -203,7 +213,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Database 文档实例
@@ -216,7 +226,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Git 文档实例
@@ -229,7 +239,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Protocol 文档实例
@@ -242,7 +252,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Excel 文档实例
@@ -255,7 +265,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Rust 文档实例
@@ -268,7 +278,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ], [
             // Python 文档实例
@@ -281,7 +291,7 @@ const config: Config = {
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],
-                rehypePlugins: [rehypeKatex],
+                rehypePlugins, // katex 公式 + 图床域名替换
             },
         ],
     ],

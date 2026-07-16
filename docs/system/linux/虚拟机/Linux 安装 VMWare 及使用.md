@@ -4,7 +4,7 @@
 
 当前最新版本是 16，官网界面如下：
 
-![vmware-official-16445474351SIyF2](https://media.ituknown.org/linux-media/VirtualMachine/VMware/vmware-official-16445474351SIyF2.png)
+![vmware-official-16445474351SIyF2](https://@media/linux-media/VirtualMachine/VMware/vmware-official-16445474351SIyF2.png)
 
 将软件包下载后任意目录下，比如我放在当前用户目录下的 VMware 目录下：
 
@@ -29,7 +29,7 @@ sudo ./VMware-Workstation-Full-16.2.1-18811642.x86_64.bundle
 
 当这个命令执行完成后就表示安装成功了！你使用 `Windows + A` 组合键盘就可以搜索到 VMware 相关软件了，示例如下：
 
-![vm-install-done-16445475393KyDbk](https://media.ituknown.org/linux-media/VirtualMachine/VMware/vm-install-done-16445475393KyDbk.png)
+![vm-install-done-16445475393KyDbk](https://@media/linux-media/VirtualMachine/VMware/vm-install-done-16445475393KyDbk.png)
 
 ## Before you can run VMware, several modules must be compiled and loaded into the running kernel?
 
@@ -40,7 +40,7 @@ Before you can run VMware, several modules must be compiled and loaded into the 
 
 截图如下：
 
-![faq-vmware-kernel-module-updater-1644646722bjpQXWdg](https://media.ituknown.org/linux-media/VirtualMachine/VMware/faq-vmware-kernel-module-updater-1644646722bjpQXWdg.png)
+![faq-vmware-kernel-module-updater-1644646722bjpQXWdg](https://@media/linux-media/VirtualMachine/VMware/faq-vmware-kernel-module-updater-1644646722bjpQXWdg.png)
 
 解决方式很简单，只需要淡定的关闭窗口，然后在命令终端执行如下命令：
 
@@ -52,21 +52,21 @@ sudo apt-get install build-essential linux-headers-$(uname -r)
 
 命令正常执行后重新打开 VMware，此时还会有 VMware Kernel Module Updater 提示。我们只需要继续点击安装编译即可：
 
-![vmware-kernel-mudule-update-install-1644647072n0piQ0Va](https://media.ituknown.org/linux-media/VirtualMachine/VMware/vmware-kernel-mudule-update-install-1644647072n0piQ0Va.png)
+![vmware-kernel-mudule-update-install-1644647072n0piQ0Va](https://@media/linux-media/VirtualMachine/VMware/vmware-kernel-mudule-update-install-1644647072n0piQ0Va.png)
 
 然后静待编译完成就好了：
 
-![vmware-kernel-mudule-update-compiling-1644647353yNpEJPoG](https://media.ituknown.org/linux-media/VirtualMachine/VMware/vmware-kernel-mudule-update-compiling-1644647353yNpEJPoG.png)
+![vmware-kernel-mudule-update-compiling-1644647353yNpEJPoG](https://@media/linux-media/VirtualMachine/VMware/vmware-kernel-mudule-update-compiling-1644647353yNpEJPoG.png)
 
 ## Could not open /dev/vmmon: No such file or directory？
 
 我使用的是 Ubuntu 20.04LTS 发行版，当我创建一个虚拟机准备运行时时却给我一个错误的弹窗提示：
 
-![create-debian-vm-16445476404CUKn6](https://media.ituknown.org/linux-media/VirtualMachine/VMware/create-debian-vm-16445476404CUKn6.png)
+![create-debian-vm-16445476404CUKn6](https://@media/linux-media/VirtualMachine/VMware/create-debian-vm-16445476404CUKn6.png)
 
 点击 **Start up this guest operating system** 后提示：
 
-![faq-vmmon-is-loaded-1644547714RLrBjn](https://media.ituknown.org/linux-media/VirtualMachine/VMware/faq-vmmon-is-loaded-1644547714RLrBjn.png)
+![faq-vmmon-is-loaded-1644547714RLrBjn](https://@media/linux-media/VirtualMachine/VMware/faq-vmmon-is-loaded-1644547714RLrBjn.png)
 
 弹窗的内容是：
 
@@ -140,7 +140,7 @@ sudo mokutil --import VMWARE16.der
 
 重启机器，在重启时你应该会进入一个蓝屏界面，在这个界面会有四个选项（如下图）。选择第二个 **Enroll MOK**，然后按照提示输入你在第五步时设置的密码！千万别整错了，这个蓝屏界面只会出现这一次，如果整错了那你只能重新执行上面的操作了。
 
-![restart-enroll-mok-1644547762PwL3Kn](https://media.ituknown.org/linux-media/VirtualMachine/VMware/restart-enroll-mok-1644547762PwL3Kn.png)
+![restart-enroll-mok-1644547762PwL3Kn](https://@media/linux-media/VirtualMachine/VMware/restart-enroll-mok-1644547762PwL3Kn.png)
 
 **7）测试模块**
 

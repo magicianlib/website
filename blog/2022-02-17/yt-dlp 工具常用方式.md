@@ -17,7 +17,7 @@ yt-dlp 工具将 youtube-dl 与 youtube-dlc 做了整合，同时内部增加了
 
 下面以某国漫（[https://www.youtube.com/watch?v=lHvamusTCK0](https://www.youtube.com/watch?v=lHvamusTCK0)）为例，使用 youtube-dl 和 yt-dlp 的下载速度对比：
 
-![yt-dlp-vs-youtube-dl-1645151899Jfx19M](https://media.ituknown.org/blog-media/yt-dlp/yt-dlp-vs-youtube-dl-1645151899Jfx19M.png)
+![yt-dlp-vs-youtube-dl-1645151899Jfx19M](https://@media/blog-media/yt-dlp/yt-dlp-vs-youtube-dl-1645151899Jfx19M.png)
 
 很明显，yt-dlp 的下载速度将 youtube-dl 甩了几条街。
 
@@ -109,7 +109,7 @@ yt-dlp -F https://www.youtube.com/watch?v=lHvamusTCK0
 
 输出示例：
 
-![yt-dlp-v-F-1645153235ABnGuv](https://media.ituknown.org/blog-media/yt-dlp/yt-dlp-v-F-1645153235ABnGuv.png)
+![yt-dlp-v-F-1645153235ABnGuv](https://@media/blog-media/yt-dlp/yt-dlp-v-F-1645153235ABnGuv.png)
 
 注意看输出示例中的 VCODEC 栏信息，共分为三类，分别是 images、audio only 和 videi only。也就是说 Youtube 上的视频是音视频分开的。如果你仅仅下载 video only 文件是只有画面没有声音，只下载 audio only 文件则只有声音没有画面。因此在下载时需要同时下载一个 audio only 文件和一个 video only 文件（yt-dlp 默认下载方式会自动下载音视频文件）。
 
@@ -347,7 +347,7 @@ $ yt-dlp --write-auto-sub --convert-subs=ass --sub-lang "zh-Hans,en" --embed-sub
 
 现在，当我们播放视频时就可以随意切换字幕了：
 
-![yt-dlp-embed-subtitle-to-video](https://media.ituknown.org/blog-media/yt-dlp/yt-dlp-embed-subtitle-to-video.png)
+![yt-dlp-embed-subtitle-to-video](https://@media/blog-media/yt-dlp/yt-dlp-embed-subtitle-to-video.png)
 
 ## 网络设置
 

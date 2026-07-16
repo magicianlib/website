@@ -108,7 +108,7 @@ key1=value1&key2=value21&key2=value22&key3=value3
 
 下图是我使用 Postman 模拟发送 `application/x-www-form-urlencoded` 请求类型示例数据，注意看左边的数据是我们实际填写的信息，而右边的数据是真正发送时被编码的数据。我们的数据被拼接成 `key=value` 的形式并进行了 UrlEncoding，最终传输的数据是： `username=%E5%BC%A0%E4%B8%89&age=18` 。
 
-![PostmanUrlencoded-1637308016N8Bh2L](https://media.ituknown.org/protocol-media/ContentType/multipart-form-data/PostmanUrlencoded-1637308016N8Bh2L.png)
+![PostmanUrlencoded-1637308016N8Bh2L](https://@media/protocol-media/ContentType/multipart-form-data/PostmanUrlencoded-1637308016N8Bh2L.png)
 
 上面是一个简单的示例，因为中文非 ASCII 码，上面的数据就被 UrlEncoding 了。而我们实际中的数据又有几个 ASCII 码？
 
@@ -257,7 +257,7 @@ Content-Type: multipart/form-data; boundary=WebKitFormBoundary
 
 下面是国内某牛的文件上传请求头自定义边界示例：
 
-![qiniu-upload-header-1637314571WDGNlG](https://media.ituknown.org/protocol-media/ContentType/multipart-form-data/qiniu-upload-header-1637314571WDGNlG.png)
+![qiniu-upload-header-1637314571WDGNlG](https://@media/protocol-media/ContentType/multipart-form-data/qiniu-upload-header-1637314571WDGNlG.png)
 
 但是啊，我要说但是了！即使你使用 `boundary` 指定了自定义边界数据，原本的 `--` 也是不能省略的。比如我们使用 `boundary` 指定了边界值为 `WebKitFormBoundary` ，那么对应的数据体就为：
 

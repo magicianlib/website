@@ -154,17 +154,17 @@ public class MonitorConfigurationProperties {
 
 现在，appId 属性是必填项，当我们不去配置时就会启动失败：
 
-<img width="" src="https://media.ituknown.org/spring-media/ConfigurationProperties/configuration-properties-validated.png" alt="configuration-properties-validated.png" />
+<img width="" src="https://@media/spring-media/ConfigurationProperties/configuration-properties-validated.png" alt="configuration-properties-validated.png" />
 
 另外，有些博客会告诉你当编写一个配置类时记得同时在 MATE-INF 目录下创建一个 spring-configuration-metadata.json 文件，并在该文件中以 JSON 的格式编写属性配置信息（如属性类型、释义以及默认值），这样当你编辑配置时就会有属性提示。
 
 实际上并不需要，因为这些事情 Spring Boot 会自动当你完成，当你编译或构建项目时会自动在 classes 文件下生成该文件。示例如下：
 
-<img width="" src="https://media.ituknown.org/spring-media/ConfigurationProperties/configuration-properties-metadata-json.png" alt="configuration-properties-metadata-json.png" />
+<img width="" src="https://@media/spring-media/ConfigurationProperties/configuration-properties-metadata-json.png" alt="configuration-properties-metadata-json.png" />
 
 之后编写配置时对应的属性提示就出来了：
 
-<img width="" src="https://media.ituknown.org/spring-media/ConfigurationProperties/configuration-properties-tips.png" alt="configuration-properties-tips.png" />
+<img width="" src="https://@media/spring-media/ConfigurationProperties/configuration-properties-tips.png" alt="configuration-properties-tips.png" />
 
 --
 

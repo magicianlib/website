@@ -2,7 +2,7 @@
 
 在很多情况下，我们可能需要将视频文件中音频流提取成一个单独的音频文件。比如视频中的音乐曲目、画外音等。另外，也有单独提取视频流和字幕流的场景。下面来使用下面这张图片做说明：
 
-<img alt="video_summary.png" src="https://media.ituknown.org/blog-media/FFmpeg/StreamExtract/video_summary.png" height="300px" />
+<img alt="video_summary.png" src="https://@media/blog-media/FFmpeg/StreamExtract/video_summary.png" height="300px" />
 
 这个图片是我抽象化的一个mkv格式的视频文件，该文件有一个视频流，两个音频流，两个字幕流。图片中流的顺序就是之后演示的顺序。
 
@@ -35,7 +35,7 @@ output.mkv
 
 这个命令执行完成后导出效果如下图：
 
-<img alt="-xn-an-sn.png" src="https://media.ituknown.org/blog-media/FFmpeg/StreamExtract/-xn-an-sn.png" height="250px" />
+<img alt="-xn-an-sn.png" src="https://@media/blog-media/FFmpeg/StreamExtract/-xn-an-sn.png" height="250px" />
 
 也就是说，导出后的视频文件没有视频和音频了。
 
@@ -54,7 +54,7 @@ output.m4a
 
 但是，这个命令执行后的效果可能也我们预期的不一样。该命令执行后输出的效果如下：
 
-<img alt="-xn-vn-sn.png" src="https://media.ituknown.org/blog-media/FFmpeg/StreamExtract/-xn-vn-sn.png" height="250px" />
+<img alt="-xn-vn-sn.png" src="https://@media/blog-media/FFmpeg/StreamExtract/-xn-vn-sn.png" height="250px" />
 
 也就是说，它保留了所有的音频，这也是 `-xn` 命令的缺点，没法输出指定的音频流。
 
@@ -126,7 +126,7 @@ ffmpeg \
 output.m4a
 ```
 
-<img alt="-map0:a:0.png" src="https://media.ituknown.org/blog-media/FFmpeg/StreamExtract/-map0a0.png" height="250px" />
+<img alt="-map0:a:0.png" src="https://@media/blog-media/FFmpeg/StreamExtract/-map0a0.png" height="250px" />
 
 或导出序号为 1 的音频流：
 
@@ -138,7 +138,7 @@ ffmpeg \
 output.m4a
 ```
 
-<img alt="-map0:a:1.png" src="https://media.ituknown.org/blog-media/FFmpeg/StreamExtract/-map0a1.png" height="250px" />
+<img alt="-map0:a:1.png" src="https://@media/blog-media/FFmpeg/StreamExtract/-map0a1.png" height="250px" />
 
 当然，也可以显示指定导出多个音频流：
 

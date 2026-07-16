@@ -67,4 +67,4 @@ $3.$ `&mut self` 是类型系统的一部分：
 
 （下面是一张使用 Nona Banana 生成的一张 Q 版卡通画）
 
-![Trait_&self_vs_&mut_self.jpg](https://media.ituknown.org/rust-media/mut/Trait_%26self_vs_%26mut_self.jpg)
+![Trait_&self_vs_&mut_self.jpg](https://@media/rust-media/mut/Trait_%26self_vs_%26mut_self.jpg)

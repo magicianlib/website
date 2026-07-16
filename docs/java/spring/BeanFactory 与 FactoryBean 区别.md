@@ -26,7 +26,7 @@ AnnotationConfigApplicationContext context = new AnnotationConfigApplicationCont
 
 事实上， `BeanFactory` 接口是 Spring 的核心也是最基本的 `IOC`  容器，而我们最常用的高级容器 `ApplicationContext` 接口就是扩展了该接口。我们经常使用 `BeanFactory` 的方式就是使用一个类去实现 `BeanFactoryAware` 接口，之后再容器初始化时会返回该类一个 `BeanFactory` 对象。有了该对象后我们就能获取 Spring 容器的每一个 Bean。先来看下 `BeanFactory` 的扩展图：
 
-![](https://media.ituknown.org/spring-media/BeanFactoryAndFactoryBean/BeanFactoryHierarchy.webp)
+![](https://@media/spring-media/BeanFactoryAndFactoryBean/BeanFactoryHierarchy.webp)
 
 看了这张图后你是不是应该明白了些什么？我们在项目中所使用的 `AnnotationConfigApplicationContext` 、 `FileSystemXmlApplicationContext` 以及 `ClassPathXmlApplicationContext` 都是间接的实现了 `BeanFactory` 接口，最主要的是： `ApplicationContext` 高级容器接口就是实现继承至该接口！
 

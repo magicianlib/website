@@ -31,13 +31,7 @@ $$
 
 实际在使用时，为了让计算的序列表现的像“真随机”一样，在设置 seed 时都很有讲究。因为<u>伪随机数算法本质就是确定性算法，所以想让结果不确定就需要尽可能的保证 seed 不容易被预测</u>。常见的做法是选择当前系统的毫秒级（或微秒级）时间作为随机数的 seed，有些程序可能会使用进程ID作为 seed。
 
-<div style={{textAlign: 'center'}}>
-  <img
-    src="https://media.ituknown.org/blog-media/PRNG/PRNG_f(x)_sketch.jpeg"
-    style={{width: '95%'}}
-    alt="PRNG_f(x)_sketch.jpeg"
-  />
-</div>
+<img src="https://@media/blog-media/PRNG/PRNG_f(x)_sketch.jpeg" width="95%" alt="PRNG_f(x)_sketch.jpeg" />
 
 另外，伪随机数生成器的可复现性在游戏和科研领域特别重要。比如游戏中除了角色之外就是 NPC，而这个 NPC 就是通过伪随机数生成的。在玩游戏时你会发现，特定的关卡不管重开多少次，NPC 出现的时间、场景以及动作总是固定的。作为玩家，可以根据游戏场景出专属攻略。如果游戏出现 bug，作为开发者也可以通过相同的 seed 复现场景解决 bug。
 

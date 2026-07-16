@@ -18,7 +18,7 @@ ip [ OPTIONS ] OBJECT { COMMAND | help }
 
 另外也可以直接在 Terminal 中输入 `ip` 或 `ip help` 命令查看详细使用信息，如下：
 
-![ip-help-1637489799GoJYS5](https://media.ituknown.org/linux-media/NetworkManager/ip-command/ip-help-1637489799GoJYS5.png)
+![ip-help-1637489799GoJYS5](https://@media/linux-media/NetworkManager/ip-command/ip-help-1637489799GoJYS5.png)
 
 `[ OPTIONS ]` 是可选参数（如上截图），常用的参数有如下：
 
@@ -93,7 +93,7 @@ $ ip -c addr show
 
 下面是输出示例：
 
-![ip-addr-show-1637491949IdhydV](https://media.ituknown.org/linux-media/NetworkManager/ip-command/ip-addr-show-1637491949IdhydV.png)
+![ip-addr-show-1637491949IdhydV](https://@media/linux-media/NetworkManager/ip-command/ip-addr-show-1637491949IdhydV.png)
 
 | **说明**                                                     |
 | :----------------------------------------------------------- |
@@ -117,7 +117,7 @@ $ ip -c -6 addr show
 
 下面是只展示 IPv4 的示例：
 
-![ip-addr-show-v4-1637492302ZUowIy](https://media.ituknown.org/linux-media/NetworkManager/ip-command/ip-addr-show-v4-1637492302ZUowIy.png)
+![ip-addr-show-v4-1637492302ZUowIy](https://@media/linux-media/NetworkManager/ip-command/ip-addr-show-v4-1637492302ZUowIy.png)
 
 ### 只显示指定网卡信息
 
@@ -137,7 +137,7 @@ $ ip -c addr show dev wlp3s0
 
 输出示例：
 
-![ip-addr-show-dev-1637492786OyUZDK](https://media.ituknown.org/linux-media/NetworkManager/ip-command/ip-addr-show-dev-1637492786OyUZDK.png)
+![ip-addr-show-dev-1637492786OyUZDK](https://@media/linux-media/NetworkManager/ip-command/ip-addr-show-dev-1637492786OyUZDK.png)
 
 当然了，这个输出的是网络接口 `wlp3s0` 的所有信息，即同时包含了 IPv4 和 IPv6。如果你只想输出指定的网络协议输出，加上 `-4` 或 `-6` 参数即可。
 
@@ -163,7 +163,7 @@ $ sudo ip addr add 192.168.1.100/24 dev wlp3s0
 
 当执行成功后，再次查看网络接口信息你就会发现多出了一个新的 IP 地址，这个地址就是你之前分配的：
 
-![ip-addr-add-1637493376QfNxUr](https://media.ituknown.org/linux-media/NetworkManager/ip-command/ip-addr-add-1637493376QfNxUr.png)
+![ip-addr-add-1637493376QfNxUr](https://@media/linux-media/NetworkManager/ip-command/ip-addr-add-1637493376QfNxUr.png)
 
 从上面的输出你也能够看出来，一个网络接口可以同时分配多个 IP 地址，也就是说你现在还可以继续分配。
 
@@ -214,7 +214,7 @@ $ ip -c link show
 
 这个命令会输出系统的所有网络接口信息，示例如下：
 
-![ip-link-show-1637494262HOkOvE](https://media.ituknown.org/linux-media/NetworkManager/ip-command/ip-link-show-1637494262HOkOvE.png)
+![ip-link-show-1637494262HOkOvE](https://@media/linux-media/NetworkManager/ip-command/ip-link-show-1637494262HOkOvE.png)
 
 ### 显示指定网络接口信息
 
@@ -280,7 +280,7 @@ $ ip -c route list
 
 输出示例：
 
-![ip-route-list-1637495453gRZuvr](https://media.ituknown.org/linux-media/NetworkManager/ip-command/ip-route-list-1637495453gRZuvr.png)
+![ip-route-list-1637495453gRZuvr](https://@media/linux-media/NetworkManager/ip-command/ip-route-list-1637495453gRZuvr.png)
 
 其中第一条 `default` 信息也就是我们常说的网关信息，也就是说我当前系统的 IP 网关为： `192.168.1.1` 。
 

@@ -47,17 +47,17 @@ Ventoy 是一个开源的多功能 U 盘启动工具，用于创建可引导的 
 
 安装完成后，使用起来就特简单。只需要将系统镜像（或其他工具）直接拷贝到U盘就可以了：
 
-![copy-iso-to-ventory.png](https://media.ituknown.org/blog-media/Ventoy/copy-iso-to-ventory.png)
+![copy-iso-to-ventory.png](https://@media/blog-media/Ventoy/copy-iso-to-ventory.png)
 
 之后其使用U盘启动时就会看到类似如下界面，选择某一个系统镜像即可：
 
-![setup-select-images.png](https://media.ituknown.org/blog-media/Ventoy/setup-select-images.png)
+![setup-select-images.png](https://@media/blog-media/Ventoy/setup-select-images.png)
 
 **关于镜像超过4G的问题：**
 
 在安装Ventoy时，默认会将U盘系统类型格式化为 exFAT，该格式支持直接拷贝4G大小镜像问题，所以这个问题理论上不存在。如果你发现无法拷贝，可能的原因就是系统格式选择了FAT32。这个时候你只需要重新打开 Ventoy2Disk.exe，在 “配置选项 — 分区设置” 中指定下分区格式重新安装即可：
 
-![setting-file-system-format.png](https://media.ituknown.org/blog-media/Ventoy/setting-file-system-format.png)
+![setting-file-system-format.png](https://@media/blog-media/Ventoy/setting-file-system-format.png)
 
 ## Verification failed: (0X1A) Security violation
 
@@ -98,7 +98,7 @@ Ventoy 是一个开源的多功能 U 盘启动工具，用于创建可引导的 
 
 之后双击 VentoyPlugson.exe，即可自动在网页上开发控制面板。之后再左侧菜单栏找到“全局控制插件”，并找到“指定搜索目录”。在设置中指定U盘中存放系统镜像的目录即可（必须是绝对路径）：
 
-![ventoy-plugson_control-setting.png](https://media.ituknown.org/blog-media/Ventoy/ventoy-plugson_control-setting.png)
+![ventoy-plugson_control-setting.png](https://@media/blog-media/Ventoy/ventoy-plugson_control-setting.png)
 
 之后就会在U盘中根据路中自动创建一个 ventoy 文件夹，文件夹内的就是具体的配置内容。特别强调，不要手动修改！！！
 

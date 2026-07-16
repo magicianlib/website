@@ -225,7 +225,7 @@ com.ituknown.spring.configuration.Config@4eb7f003
 
 为了方便理解，下面是一张使用 Debug 调试的截图，该截图很直截了当的说明了该问题：
 
-![](https://media.ituknown.org/spring-media/%40Configuration/DebugDemo.webp)
+![](https://@media/spring-media/%40Configuration/DebugDemo.webp)
 
 现在，带着该问题我们来看该类什么使用时候被代理的。
 
@@ -299,7 +299,7 @@ $3.$ 查看类是否需要代理(`cglib`)
 
 该方法是 `AbstractApplicationContext` 抽象类的方法，为了理解该抽象类与我们注解配置类的关系我们来看下简单的类图：
 
-<img height="400px" src="https://media.ituknown.org/spring-media/%40Configuration/AbstractApplicationContext.webp" />
+<img height="400px" src="https://@media/spring-media/%40Configuration/AbstractApplicationContext.webp" />
 
 知道其关系后我们最主要的还是看其中的 `invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory)` 方法。该方法可以理解为是一个空壳方法：
 
@@ -938,7 +938,7 @@ boolean alreadyInCreation = beanFactory.isCurrentlyInCreation(beanName);
 
 这行代码调用的是 BeanFactory ，这个 BeanFactory 与 Spring 容器德一个非常重要的类`DefaultListableBeanFactory` 有关系，到底有多重要，这里不说。但这里调用的 `isCurrentlyInCreation` 方法却是另一个类 `DefaultSingletonBeanRegistry` 的方法。这个类与 `DefaultListableBeanFactory` 又有什么关系？看下类图：
 
-<img height="400px" src="https://media.ituknown.org/spring-media/%40Configuration/DefaultListableBeanFactory%20.webp" />
+<img height="400px" src="https://@media/spring-media/%40Configuration/DefaultListableBeanFactory%20.webp" />
 
 那么该类在 Spring 中起到什么作用呢？先看这个类定义的几个常量：
 

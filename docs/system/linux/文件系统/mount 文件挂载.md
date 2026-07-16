@@ -56,7 +56,7 @@ NAME       MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
 
 之所以会这样是因为我在安装系统时在分区这一步我选择了 `“All files in one partition”` ，每个人在这一步可能都会选择不同的分区模式所以可能都有些不一样。
 
-![selected-for-partitioning-1656123276fzofeK](https://media.ituknown.org/linux-media/Filesystem/mount/selected-for-partitioning-1656123276fzofeK.png)
+![selected-for-partitioning-1656123276fzofeK](https://@media/linux-media/Filesystem/mount/selected-for-partitioning-1656123276fzofeK.png)
 
 那么现在来想一下，Linux 系统为什么要这么设计？这么设计有什么好处吗？
 

@@ -46,13 +46,7 @@ struct Data {
 
 因为 CPU 每次读取一“行”数据（64 字节），编译器并不保证结构体中的字段在内存中连续性，但如果 a 和 b 在内存中是连续的（或距离很近），那么在读取 a 时，b 极大概率会被同时加载进 CPU Cache Line 中：
 
-<div style={{textAlign: 'center'}}>
-  <img
-    src="https://media.ituknown.org/blog-media/CpuCacheLine/CpuLoadCacheLine.png"
-    style={{width: '80%'}}
-    alt="CpuLoadCacheLine.png"
-  />
-</div>
+<img src="https://@media/blog-media/CpuCacheLine/CpuLoadCacheLine.png" width="80%" alt="CpuLoadCacheLine.png" />
 
 一次将两个数据都加载到同一个 CPU Cache Line 中，这带来一个好处：当需要访问 b 时不需要再次访问主内存，减少了 CPU 缓存与主内存的数据交换频率，可提高性能。
 
@@ -64,13 +58,7 @@ struct Data {
 
 在多线程场景下，这种频繁的 MESI 通信就是拖慢程序性能的罪魁祸首（如下图）
 
-<div style={{textAlign: 'center'}}>
-  <img
-    src="https://media.ituknown.org/blog-media/CpuCacheLine/CacheLineMESI.png"
-    style={{width: '70%'}}
-    alt="CacheLineMESI.png"
-  />
-</div>
+<img src="https://@media/blog-media/CpuCacheLine/CacheLineMESI.png" width="70%" alt="CacheLineMESI.png" />
 
 这就是真伪共享的问题。
 
@@ -125,7 +113,7 @@ struct TureSharing {
 
 效果如下：
 
-![CacheLineSharing.png](https://media.ituknown.org/blog-media/CpuCacheLine/CacheLineSharing.png)
+![CacheLineSharing.png](https://@media/blog-media/CpuCacheLine/CacheLineSharing.png)
 
 <details>
 <summary>一个不专业的 Rust 测试例子</summary>

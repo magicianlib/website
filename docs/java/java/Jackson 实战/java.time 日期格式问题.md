@@ -108,7 +108,7 @@ private static void configureObjectMapper4Jsr310(ObjectMapper objectMapper) {
 
 先看下 JavaTimeModule 类继承图：
 
-<img src="https://media.ituknown.org/java-media/jackson/JavaTimeModule1708509985.png" width="500px"/>
+<img src="https://@media/java-media/jackson/JavaTimeModule1708509985.png" width="500px"/>
 
 配置日期格式问题我们主要借助它的两个方法：
 
@@ -201,7 +201,7 @@ System.out.println(user);
 
 看下截图：
 
-![HandlerJava8DateTime1708510099.png](https://media.ituknown.org/java-media/jackson/HandlerJava8DateTime1708510099.png)
+![HandlerJava8DateTime1708510099.png](https://@media/java-media/jackson/HandlerJava8DateTime1708510099.png)
 
 这就完结解决 Java8 日期格式的问题了~
 

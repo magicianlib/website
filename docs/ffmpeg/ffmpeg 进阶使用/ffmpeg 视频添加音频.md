@@ -2,7 +2,7 @@
 
 音视频合并最简单的用法就是一个视频文件、一个音频文件，然后将这两个流进行合并，下图是效果图：
 
-<img alt="add_audio.png" src="https://media.ituknown.org/blog-media/FFmpeg/VideoCombinedAudio/add_audio.png" height="250px" />
+<img alt="add_audio.png" src="https://@media/blog-media/FFmpeg/VideoCombinedAudio/add_audio.png" height="250px" />
 
 对应命令如下：
 
@@ -26,7 +26,7 @@ video_with_audio.mp4 \
 
 另一种情况是，视频文件本身就存在音频。但是我们想使用某个特定的音频文件替换原视频中的音频：
 
-<img alt="replace_audio.png" src="https://media.ituknown.org/blog-media/FFmpeg/VideoCombinedAudio/replace_audio.png" height="250px" />
+<img alt="replace_audio.png" src="https://@media/blog-media/FFmpeg/VideoCombinedAudio/replace_audio.png" height="250px" />
 
 此时，我们就需要借助 `-map` 映射参数来实现。使用 `-map` 参数从两个流媒体文件中分别提取视频流和音频流并将这两个流进行合并即可：
 
@@ -83,7 +83,7 @@ video_empty_audio.mp4
 
 经常在电影院看大型巨作时都会发现，一个视频通常有多种音频语言。比如英文音频，又或者中文音频：
 
-<img alt="multi_audio.png" src="https://media.ituknown.org/blog-media/FFmpeg/VideoCombinedAudio/multi_audio.png" height="250px" />
+<img alt="multi_audio.png" src="https://@media/blog-media/FFmpeg/VideoCombinedAudio/multi_audio.png" height="250px" />
 
 不管有多少音轨，其本质都是视频容器中的一个流而已。想要实现这种效果我们只需要将目标音频流打包到视频文件中即可：
 
@@ -101,13 +101,13 @@ video_with_multi_audio.mp4
 
 不过，在播放时需要注意，视频播放器不会同时播放所有的音频，默认会选择第一个音频。如果你想要选择第二个音频需要手动选择，下图是 IINA 播放器音频选择示例：
 
-<img alt="multi_audio_play.png" src="https://media.ituknown.org/blog-media/FFmpeg/VideoCombinedAudio/multi_audio_play.png" height="250px" />
+<img alt="multi_audio_play.png" src="https://@media/blog-media/FFmpeg/VideoCombinedAudio/multi_audio_play.png" height="250px" />
 
 ### 合并多个音频文件
 
 前面只是从一个音频文件中提取音频，事实上可以从多个音频文件中提取音频流：
 
-<img alt="from_multi_audio_file.png" src="https://media.ituknown.org/blog-media/FFmpeg/VideoCombinedAudio/from_multi_audio_file.png" height="250px" />
+<img alt="from_multi_audio_file.png" src="https://@media/blog-media/FFmpeg/VideoCombinedAudio/from_multi_audio_file.png" height="250px" />
 
 命令如出一辙，只是多了几个映射而已：
 
@@ -129,7 +129,7 @@ video_with_multi_audio.mp4
 
 这种用法随处可见，在看电视剧或电影时通常会发现角色在交流时都会有对应的背景音乐烘托场景环境。这其实都是后期制作，也是典型的混音。即如下效果：
 
-<img alt="mixing_audio.png" src="https://media.ituknown.org/blog-media/FFmpeg/VideoCombinedAudio/mixing_audio.png" height="250px" />
+<img alt="mixing_audio.png" src="https://@media/blog-media/FFmpeg/VideoCombinedAudio/mixing_audio.png" height="250px" />
 
 实现这种效果的命令如下：
 
@@ -176,7 +176,7 @@ video_with_mixing_audio.mp4
 
 在上面的例子中，声音都是从头开始。如果想要延迟混音的开始时间，我需要添加一个延迟。效果如下：
 
-<img alt="range_mixing_audio.png" src="https://media.ituknown.org/blog-media/FFmpeg/VideoCombinedAudio/range_mixing_audio.png" height="250px" />
+<img alt="range_mixing_audio.png" src="https://@media/blog-media/FFmpeg/VideoCombinedAudio/range_mixing_audio.png" height="250px" />
 
 要做到这一点，只需要在 amix 过滤器中指定某个音频的延迟时间即可（单位为毫秒），下面是示例：
 

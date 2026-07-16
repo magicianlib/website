@@ -45,7 +45,7 @@ public class EventObject implements java.io.Serializable {
 
 而在 Spring 框架中官方人员对该类做了进一步扩展，看下类的继承关系图：
 
-![EventObject.png](https://media.ituknown.org/spring-media/EventListener/EventObject.png)
+![EventObject.png](https://@media/spring-media/EventListener/EventObject.png)
 
 `ApplicationEvent` 抽象类是 Spring 对 `java.util.EventObject` 做的初步扩展，该类没有其他实际意义，仅仅只是在其基础上增加了事件创建时间属性：
 

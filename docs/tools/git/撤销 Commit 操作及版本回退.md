@@ -66,7 +66,7 @@ option 就是执行 reset 的选项，稍后说。其后跟的是版本号，比
 
 示例（红色框标记的就是 commit_id）：
 
-![git-log-1644677941cU4sE0](https://media.ituknown.org/git-media/BranchManager/git-log-1644677941cU4sE0.png)
+![git-log-1644677941cU4sE0](https://@media/git-media/BranchManager/git-log-1644677941cU4sE0.png)
 
 所以，对于已经 commit（或执行 merge 后生成一个 commit）的操作，我们只需要将版本回退到 commit 之前的一个版本即可。另外，有时候我们虽然执行 merge 了，但是并没有生成新的 commit 操作，对于这种情况我们仅仅需要找到最后一次 commit 的 id，执行回退操作即可。
 
@@ -158,7 +158,7 @@ HEAD is now at 55cf413 Initial commit
 
 如下：
 
-![git-log-rollbackid-1644677934gU3mB2](https://media.ituknown.org/git-media/BranchManager/git-log-rollbackid-1644677934gU3mB2.png)
+![git-log-rollbackid-1644677934gU3mB2](https://@media/git-media/BranchManager/git-log-rollbackid-1644677934gU3mB2.png)
 
 这里我要将版本回退到 “Fix trailing space” 这个版本，对应的提交记录是：83ebc604fb2e94461e2c2c597545c59cb1705cbc。
 
@@ -212,7 +212,7 @@ Already up-to-date.
 
 即先将你要强制 push 的分支取消受保护，但是 **强推成功后一定要重新添加为受保护的分支**！！
 
-![git-branch-unprotect-1644677911eJ6cF0](https://media.ituknown.org/git-media/BranchManager/git-branch-unprotect-1644677911eJ6cF0.png)
+![git-branch-unprotect-1644677911eJ6cF0](https://@media/git-media/BranchManager/git-branch-unprotect-1644677911eJ6cF0.png)
 
 ## 总结
 
