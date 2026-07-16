@@ -3,14 +3,14 @@ name: Deploy Docusaurus to GitHub Pages Repo
 on:
   push:
     branches:
-      - main # 如果你的默认开发分支是 master，请改为 master
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 拉取源仓库代码
+      # 1. 拉取仓库代码
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
@@ -20,7 +20,7 @@ jobs:
         with:
           version: 11.4.0 # 或者指定具体的 pnpm 版本，如 9.x.x
 
-      # 3. 设置 Node.js 环境 (使用 24.11.1 并在 pnpm 模式下配置缓存)
+      # 3. 设置 Node.js 环境
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
