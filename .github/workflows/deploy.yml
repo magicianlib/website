@@ -13,12 +13,12 @@ jobs:
       # 1. 拉取仓库代码
       # https://github.com/actions/checkout/releases
       - name: Checkout Source Code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7
 
       # 2. 安装 pnpm
       # https://github.com/pnpm/action-setup/releases
       - name: Install pnpm
-        uses: pnpm/action-setup@v6.0.8
+        uses: pnpm/action-setup@v6
         with:
           # 不指定 pnpm 版本, 默认使用 package.json 中配置 的 packageManager 版本
           # version: 11.4.0
@@ -27,7 +27,7 @@ jobs:
       # 3. 设置 Node.js 环境
       # https://github.com/actions/setup-node/releases
       - name: Set up Node.js
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7
         with:
           node-version: "24.11.1" # 或者指定具其他版本
 
@@ -40,6 +40,7 @@ jobs:
         run: pnpm run build
 
       # 6. 将构建产物部署到目标仓库
+      # https://github.com/JamesIves/github-pages-deploy-action/releases
       - name: Deploy to Target Repo
         uses: JamesIves/github-pages-deploy-action@v4
         with:
