@@ -20,7 +20,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:
-          # 不指定 pnpm 版本, 默认使用 package.json 中配置 的 packageManager 版本
+          # 不指定 pnpm 版本, 默认使用 package.json 中配置的 packageManager 版本
           # version: 11.4.0
           cache: true
 
