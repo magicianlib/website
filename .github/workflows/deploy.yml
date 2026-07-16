@@ -20,7 +20,8 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.8
         with:
-          version: 11.4.0 # 或者指定具体的 pnpm 版本，如 9.x.x
+          # 不指定 pnpm 版本, 默认使用 package.json 中配置 的 packageManager 版本
+          # version: 11.4.0
           cache: true
 
       # 3. 设置 Node.js 环境
