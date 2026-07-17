@@ -14,6 +14,10 @@ jobs:
       # https://github.com/actions/checkout/releases
       - name: Checkout Source Code
         uses: actions/checkout@v7
+        with:
+          # 关闭凭证持久化:否则 checkout 会把 GITHUB_TOKEN 留在 git 配置里,
+          # 后面 JamesIves 部署步骤用 PAT 跨仓库 push 时会被它顶掉,报 github-actions[bot] 403。
+          persist-credentials: false
 
       # 2. 安装 pnpm
       # https://github.com/pnpm/action-setup/releases
