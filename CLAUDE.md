@@ -2,6 +2,10 @@
 
 本仓库是 Docusaurus 个人知识站，`docs/` 下是技术笔记。
 
+## 方案 / 计划文档
+
+superpowers（brainstorming / writing-plans 等）生成的方案文档（design spec、plan）写到 `.claude/specs/`，**不要**写到 `docs/` 下。`docs/` 是 Docusaurus 站点文档源，混入方案文档会污染目录树。
+
 ## 文档写作风格
 
 写或改 `docs/` 下的文档时，用「知识总结」的口吻，而非「教程」口吻：

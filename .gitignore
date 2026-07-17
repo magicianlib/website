@@ -25,4 +25,3 @@ yarn-error.log*
 
 # Claude
 .claude/settings.local.json
-docs/superpowers
