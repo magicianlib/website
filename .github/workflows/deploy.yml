@@ -15,8 +15,8 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v7
         with:
-          # 关闭凭证持久化:否则 checkout 会把 GITHUB_TOKEN 留在 git 配置里,
-          # 后面 JamesIves 部署步骤用 PAT 跨仓库 push 时会被它顶掉,报 github-actions[bot] 403。
+          # 必须关闭:checkout 默认会把 GITHUB_TOKEN 留在 git 配置里,
+          # 下方跨仓库部署用 PAT 推送时会被它顶掉,报 github-actions[bot] 403
           persist-credentials: false
 
       # 2. 安装 pnpm
@@ -43,29 +43,17 @@ jobs:
       - name: Build Website
         run: pnpm run build
 
-      # 5.5 诊断:确认 DEPLOY_TOKEN 在【本仓库】可读且对目标仓库有 push 权限
-      # 确认无误后可删除此步骤
-      - name: Debug deploy token
-        env:
-          TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-        run: |
-          echo "DEPLOY_TOKEN length = ${#TOKEN}"
-          if [ -z "$TOKEN" ]; then
-            echo "::error::DEPLOY_TOKEN 在本仓库 (magicianlib/website) 的 secrets 里为空或不存在!"
-            echo "::error::secret 必须建在【运行 workflow 的源仓库 magicianlib/website】, 不是目标仓库 ituknown.github.io, 也不是组织级 secret。"
-            exit 1
-          fi
-          echo "=== 用该 token 查询目标仓库 ituknown/ituknown.github.io 的权限 ==="
-          curl -s -H "Authorization: token $TOKEN" \
-            https://api.github.com/repos/ituknown/ituknown.github.io | grep -A6 '"permissions"'
-
       # 6. 将构建产物部署到目标仓库
+      # 跨仓库部署:目标仓库 ituknown/ituknown.github.io 与源仓库不同,
+      # 必须用 PAT(DEPLOY_TOKEN),默认 GITHUB_TOKEN 无法跨仓库写。
+      # DEPLOY_TOKEN 为对目标仓库有写权限的 classic PAT(repo scope),
+      # 存放在【本仓库】Settings → Secrets and variables → Actions。
       # https://github.com/JamesIves/github-pages-deploy-action/releases
       - name: Deploy to Target Repo
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           token: ${{ secrets.DEPLOY_TOKEN }}
-          repository-name: ituknown/ituknown.github.io
+          repository-name: ituknown/ituknown.github.io # 目标 Pages 仓库
           branch: main # 目标仓库接收静态文件的分支
-          folder: build # Docusaurus 默认构建输出的目录
-          clean: true # 部署时自动清理目标分支中旧的多余文件
+          folder: build # Docusaurus 默认构建输出目录
+          clean: true # 部署时清掉目标分支中不再存在的旧文件
