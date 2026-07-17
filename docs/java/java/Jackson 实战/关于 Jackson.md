@@ -1,42 +1,31 @@
----
-sidebar_position: 1
----
-Jackson Github 地址：[https://github.com/FasterXML](https://github.com/FasterXML)
+Jackson 是 Java 生态事实上的 JSON 处理库，GitHub 地址 [FasterXML/Jackson](https://github.com/FasterXML)。本系列聚焦实际工程里反复用到的序列化 / 反序列化配置与扩展，不展开与 Gson、Fastjson 的性能对比。
 
-Jackson 是干什么的也没必要过多说明，相信各位应该都很熟悉。Jackson 和 GJson 以及 Fastjson 的性能比较啊，本篇也不做说明。因为啰里啰嗦的实在没意义，有兴趣的自行百度谷歌吧。
+Jackson 在实际工程里覆盖三种格式，都建立在同一套 `ObjectMapper` API 之上：
 
-Jaskson 在实际中主要有两方面的应用：JSON 转换以及 XML 的转换，本篇介绍 JSON 字符串和对象之间的转换。
+- JSON（主力场景）：[JSON 序列化](./基础用法/JSON%20序列化.md)、[JSON 反序列化](./基础用法/JSON%20反序列化.md)
+- XML：[XML 序列化](./其他格式/XML%20序列化.md)
+- MessagePack 二进制：[MessagePack 二进制序列化](./其他格式/MessagePack%20二进制序列化.md)
 
-想要使用 Jaskson 需要在 pom 文件中引入它的依赖：
+## 依赖
+
+只需要 `jackson-databind`，它内嵌了 `jackson-core` 和 `jackson-annotations`，日常 JSON 场景够用：
 
 ```xml
 <dependency>
     <groupId>com.fasterxml.jackson.core</groupId>
     <artifactId>jackson-databind</artifactId>
-    <version>${jaskon.version}</version>
+    <version>${jackson.version}</version>
 </dependency>
 ```
 
-| **说明** |
-|:--- |
-|在实际使用中我们只需要引入 `jackson-databind` 这个依赖即可，因为该依赖内嵌了 jaskson 核心依赖包和注解依赖包，在实际中基本上已经满足我们的需要了。|
+用到 `java.time.*` 日期还要加 `jackson-datatype-jsr310`；XML、MessagePack 各自需要对应的 dataformat 扩展，具体见对应文档。
 
-想要使用 Jackson 的 JSON 转换 API 只需要声明一个 ObjectMapper 对象即可：
+## ObjectMapper
 
-```java
-ObjectMapper objectMapper = new ObjectMapper();
-```
-
-另外，ObjectMapper 是线程安全的类，所以为了运行效率我们通常声明一个全局的 Jackson 对象即可。如下：
+`ObjectMapper` 是所有操作的入口。它是线程安全的，整个应用声明一个全局单例即可，不要每次序列化都 new 一个：
 
 ```java
-public final class JacksonUtil {
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    public static ObjectMapper getObjectMapper () {
-        return OBJECT_MAPPER;
-    }
-
-}
+private static final ObjectMapper MAPPER = new ObjectMapper();
 ```
+
+更推荐用 `JsonMapper.builder()` 集中配置，把忽略未知字段、跳过 null、时区、`java.time` 处理等一次性写好，见 [ObjectMapper 配置](./基础用法/ObjectMapper%20配置.md)。配置固定后，可以直接用工具类封装常用 API，见 [JacksonUtils 工具类封装](./高级特性/JacksonUtils%20工具类封装.md)。
