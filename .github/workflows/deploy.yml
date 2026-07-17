@@ -44,7 +44,7 @@ jobs:
       - name: Deploy to Target Repo
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.DEPLOY_TOKEN }}
+          token: ${{ secrets.DEPLOY_TOKEN_TEMP }}
           repository-name: ituknown/ituknown.github.io
           branch: main # 目标仓库接收静态文件的分支
           folder: build # Docusaurus 默认构建输出的目录
