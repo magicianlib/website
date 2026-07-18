@@ -181,9 +181,9 @@ const config: Config = {
             '@docusaurus/plugin-content-docs',
             {
                 id: 'java',
-                path: 'docs/java/java',
+                path: 'docs/java/core',
                 routeBasePath: 'java',
-                sidebarPath: './sidebars/java/java.ts',
+                sidebarPath: './sidebars/java/core.ts',
                 showLastUpdateTime: false,
                 onInlineTags: 'throw',
                 remarkPlugins: [remarkMath],

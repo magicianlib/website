@@ -17,6 +17,7 @@ const sidebars: SidebarsConfig = {
             collapsed: true, // 默认折叠
             items: [
                 'Java8 日期/java.time 正确使用姿势',
+                'Java8 日期/日期格式化 DateTimeFormatter',
                 'Java8 日期/Duration 和 Period 的区别',
             ],
         },
