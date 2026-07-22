@@ -18,6 +18,10 @@ YAML:
   label: 加密
   permalink: /加密
 
+安全:
+  label: 安全
+  permalink: /安全
+
 软硬件:
   label: 软硬件
   permalink: /软硬件
