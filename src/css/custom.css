@@ -56,3 +56,38 @@
 .docusaurus-mermaid-container text {
   font-weight: 700;
 }
+
+/* ============================================================
+ * Blog 布局：居中三栏（固定轨道），宽屏两侧留对称空白，切换文章不跳动
+ *
+ * 默认 Infima 三栏是百分比 flex，且按整组实际宽度布局：有 TOC 时组宽多一栏、
+ * 没 TOC 时少一栏，导致 [Recent posts] 横向跳位（页面"晃一下"）。
+ * 改成固定三轨 grid：左 Recent posts / 正文 / 右 TOC 三条轨道宽度固定，
+ * 右 TOC 轨道始终保留（当前文章没 TOC 时留空），于是左栏与正文位置恒定；
+ * 再用 justify-content:center 让整组居中。仅作用于 blog（标记 class 只挂在
+ * BlogLayout 上）。桌面端生效；移动端维持默认堆叠。
+ * ============================================================ */
+@media (min-width: 997px) {
+
+  /* 容器上限 1320px → 2500px，给居中留出两侧对称空白 */
+  .blog-container {
+    max-width: 2500px;
+  }
+
+  /* 固定三轨网格 + 整组居中。
+   * 轨道：左 Recent posts 20rem / 正文 ≤80rem / 右 TOC 15rem。
+   * 关键：右 TOC 轨道（15rem）始终保留，当前文章没有 TOC 时留空——
+   * 这样 [Recent posts] 与正文位置固定，切换文章（有无 TOC）时不会左右跳动。 */
+  .blog-row {
+    display: grid;
+    grid-template-columns: 20rem minmax(0, 80rem) 15rem;
+    justify-content: center;
+  }
+
+  /* 取消 Infima .col 的百分比 max-width，宽度交给上面的网格轨道决定；
+   * min-width:0 让正文轨在空间不足时能收缩，并防止宽表格 / 图片 / 长代码撑爆列。 */
+  .blog-row>.col {
+    max-width: none;
+    min-width: 0;
+  }
+}
