@@ -18,9 +18,11 @@
 |*,!repo2（推荐）|替代除了 id 为 repo2 以外的所有仓库|比如替代除了私服之外的所有仓库（可以指定多个）|
 
 <details open>
-<summary>**什么是仓库 id？**</summary>
+<summary><strong>什么是仓库 id？</strong></summary>
 
-```xml title="settings.xml" {7,13}
+示例配置文件 `settings.xml`：
+
+```xml {7,13}
 <settings>
     <profiles>
         <profile>
@@ -42,7 +44,9 @@
 </settings>
 ```
 
-其中 nexus 就是仓库 id。如果想替换所有仓库，但是唯独该私服不需要镜像，写法如下：
+该示例中仓库ID是 `nexus`，而不是 `office`。关于配置ID说明见下文 [激活指定 profile](#激活指定-profile)。
+
+言归正传，如果想代理/镜像除私服之外的所有仓库，写法如下：
 
 ```xml {4}
 <mirror>
