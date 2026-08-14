@@ -31,10 +31,13 @@ CREATE ROLE debezium WITH REPLICATION LOGIN PASSWORD '你的密码';
 GRANT CONNECT ON DATABASE db TO debezium;
 
 -- 授予 schema 使用权限与现有表读取权限（public 仅为示例，替换为实际 schema）
+-- 表分布在多个 schema 时需对每个 schema 分别授权
+-- NOTE: 必须进入目标数据库里执行，不能使用 库名.schema
 GRANT USAGE ON SCHEMA public TO debezium;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO debezium;
 
 -- （可选）后续新建表自动获得读取权限
+-- NOTE: 必须进入目标数据库里执行，不能使用 库名.schema
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO debezium;
 
 COMMIT;
