@@ -8,6 +8,7 @@ const sidebars: SidebarsConfig = {
         'Topic 管理',
         'Topic 最佳实践',
         'PostgreSQL 连接器',
+        'Debezium 消费与下游同步',
     ],
 };
 
