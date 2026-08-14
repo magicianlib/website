@@ -60,6 +60,9 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
+      # 6. 数据目录指向挂载路径；镜像默认写在容器内 /tmp，不显式指定的话重建容器会丢全部数据
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data'
+
       # 禁用 topic 自动创建；业务 topic 需显式创建
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
 
@@ -190,7 +193,9 @@ healthcheck:
 
 通过探测容器内 `PLAINTEXT` 端口能否列出 topic，判定 Broker 是否真正就绪。Debezium 用 `depends_on.kafka.condition: service_healthy` 等待该检查通过后再启动，避免 Kafka 未就绪时 Connect 连接失败退出。
 
-### 数据卷
+### 数据卷与数据目录
+
+`KAFKA_LOG_DIRS` 指定 broker 的数据目录（对应配置项 `log.dirs`），这里指向挂载路径 `/var/lib/kafka/data`。**这一步必须显式设置**：`apache/kafka` 镜像默认把数据写在容器内临时路径，重建容器后数据全部丢失。
 
 `./data/kafka:/var/lib/kafka/data` 把 Kafka 数据落到宿主机相对目录，容器重建不丢数据。建议 Kafka 与 Debezium 各自独立目录，避免数据混合。
 
