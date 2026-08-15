@@ -8,6 +8,7 @@ const sidebars: SidebarsConfig = {
         'Topic 最佳实践',
         'Docker Compose 部署',
         'PostgreSQL 连接器',
+        'MySQL 连接器',
         'Debezium 消费与下游同步',
     ],
 };
