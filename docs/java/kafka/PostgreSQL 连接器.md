@@ -18,7 +18,7 @@
   - REST 端口 8083
 - PostgreSQL：
   - 账号密码 admin/admin123
-  - 库名 shop
+  - 库名 order_db
 
 Kafka 与 Connect 的部署细节见 [Docker Compose 部署](./Docker%20Compose%20部署.md)。
 :::
@@ -38,7 +38,7 @@ Debezium 通过 PostgreSQL 的逻辑解码读取变更日志，源库需满足�
 本仓库的 `pgsql17/conf/postgresql.conf` 已配置好这三项。容器内的确认方法：
 
 ```bash
-$ docker exec postgres sh -c "psql -U admin -d shop -c 'SHOW wal_level;'"
+$ docker exec postgres sh -c "psql -U admin -d order_db -c 'SHOW wal_level;'"
  wal_level
 -----------
  logical
@@ -60,16 +60,18 @@ $ docker exec postgres sh -c "psql -U admin -d shop -c 'SHOW wal_level;'"
 
 连接器需要一个具备逻辑复制权限的账号。本地调试可以直接用超管账号（具备隐式复制权限），但生产环境务必用下面的最小权限账号。
 
-在目标数据库里执行（`psql` 必须先进入库 `\c shop` 或 `psql -d shop`，权限类语句不能用 `库名.schema` 形式跨库执行）：
+在目标数据库里执行（`psql` 必须先进入库 `\c order_db` 或 `psql -d order_db`，权限类语句不能用 `库名.schema` 形式跨库执行）：
 
 ```sql
 BEGIN;
 
 -- 创建用于 CDC 的登录账号，必须具备逻辑复制权限
-CREATE ROLE debezium WITH REPLICATION LOGIN PASSWORD 'Admin@123';
+CREATE ROLE debezium WITH REPLICATION LOGIN PASSWORD 'debezium@123';
 
--- 允许连接到目标数据库
-GRANT CONNECT ON DATABASE shop TO debezium;
+-- 允许连接到目标数据库(以 order_db 为例)
+GRANT CONNECT ON DATABASE order_db TO debezium;
+
+-- 后续SQL需要进入到目标库后执行
 
 -- 授予 schema 使用权限与现有表读取权限（public 仅为示例，替换为实际 schema）
 GRANT USAGE ON SCHEMA public TO debezium;
@@ -89,15 +91,25 @@ COMMIT;
 - `GRANT SELECT ON ALL TABLES`：快照阶段要全表读取存量数据。
 - `ALTER DEFAULT PRIVILEGES`：让以后新建的表自动继承 SELECT 权限，省得每建一张表就补一次授权。注意它只对「执行这条语句之后该角色新建的表」生效，已存在的表仍需上一条 `GRANT SELECT` 覆盖。
 
-:::caution[PG15+ 还差一步]
-PostgreSQL 15 起，对数据库执行 `CREATE PUBLICATION ... FOR ALL TABLES` 需要超管权限，最小权限账号没有。而 Debezium 首次启动时会尝试自动创建 publication，于是任务直接 FAILED，日志报 `permission denied for database shop`。解决办法是用超管**预建**同名 publication（连接器看到已存在就不再创建，只会校验和复用）：
+:::danger[PG15+ 还差一步]
+PostgreSQL 15 起，对数据库执行 `CREATE PUBLICATION ... FOR ALL TABLES` 需要超管权限，最小权限账号没有。而 Debezium 首次启动时会尝试自动创建 publication，于是任务直接 FAILED，日志报 `permission denied for database order_db`。解决办法是用超管**预建**同名 publication（连接器看到已存在就不再创建，只会校验和复用）：
 
 ```sql
 -- 用超管账号（本环境为 admin）在目标库执行
-CREATE PUBLICATION dbpublication FOR ALL TABLES;
+CREATE PUBLICATION "publication.order_db" FOR ALL TABLES;
+
+-- 之后可以查看所有 publication
+SELECT * FROM pg_publication;
+
++-----+----------------------+--------+------------+---------+---------+---------+-----------+----------+
+|oid  |pubname               |pubowner|puballtables|pubinsert|pubupdate|pubdelete|pubtruncate|pubviaroot|
++-----+----------------------+--------+------------+---------+---------+---------+-----------+----------+
+|24772|publication.order_db  |10      |true        |true     |true     |true     |true       |false     |
++-----+----------------------+--------+------------+---------+---------+---------+-----------+----------+
+
 ```
 
-`dbpublication` 是自定义名字（库内唯一即可），但**必须与第三步连接器配置里的 `publication.name` 完全一致**：Debezium 启动时按 `publication.name` 的值去数据库找 publication，找到就复用，找不到才尝试创建。名字对不上时预建等于白建，连接器还是会因权限不足而失败。
+`publication.order_db` 是自定义名字（<u>**库内唯一即可**</u>），但<u>**必须与第三步连接器配置里的 `publication.name` 完全一致**</u>：Debezium 启动时按 `publication.name` 的值去数据库找 publication，找到就复用，找不到才尝试创建。名字对不上时预建等于白建，连接器还是会因权限不足而失败。
 
 这是 PG15+ 最小权限方案下必踩的坑，本文注册连接器前会先执行它。
 :::
@@ -108,19 +120,19 @@ CREATE PUBLICATION dbpublication FOR ALL TABLES;
 
 ```json
 {
-  "name": "pg-connector",
+  "name": "pg-connector.order_db",
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-    "topic.prefix": "pgcdc",
-    "database.hostname": "postgres",
+    "topic.prefix": "pgcdc.order_db",
+    "database.hostname": "localhost:5432",
     "database.port": "5432",
     "database.user": "debezium",
-    "database.password": "Admin@123",
-    "database.dbname": "shop",
+    "database.password": "debezium@123",
+    "database.dbname": "order_db",
     "plugin.name": "pgoutput",
-    "slot.name": "debezium_pg_shop",
-    "publication.name": "dbpublication",
-    "table.include.list": "public.customers",
+    "slot.name": "debezium_pg_order_db",
+    "publication.name": "publication.order_db",
+    "table.include.list": "public.*",
     "decimal.handling.mode": "string",
     "topic.creation.default.replication.factor": "1",
     "topic.creation.default.partitions": "1"
@@ -136,7 +148,7 @@ $ curl -i -X POST http://localhost:8083/connectors \
   -d @register-pg.json
 
 HTTP/1.1 201 Created
-{"name":"pg-connector","config":{...},"tasks":[],"type":"source"}
+{"name":"pg-connector.order_db","config":{...},"tasks":[],"type":"source"}
 ```
 
 返回 `201` 只是连接器登记成功，任务还没跑起来，紧接着必须查状态：
@@ -144,7 +156,7 @@ HTTP/1.1 201 Created
 ```bash
 $ curl -s http://localhost:8083/connectors/pg-connector/status
 
-{"name":"pg-connector","connector":{"state":"RUNNING","worker_id":"172.20.0.3:8083"},
+{"name":"pg-connector.order_db","connector":{"state":"RUNNING","worker_id":"172.20.0.3:8083"},
  "tasks":[{"id":0,"state":"RUNNING","worker_id":"172.20.0.3:8083"}],"type":"source"}
 ```
 
@@ -167,32 +179,114 @@ $ curl -s http://localhost:8083/connectors/pg-connector/status
 
 ### 配置项详解
 
+
 <table class="config-table">
-<colgroup>
-<col style={{width: '25%'}} />
-<col style={{width: '25%'}} />
-<col style={{width: '50%'}} />
-</colgroup>
-<thead>
-<tr><th>配置项</th><th>本例取值</th><th>作用与选值理由</th></tr>
-</thead>
-<tbody>
-<tr><td><code>name</code></td><td><code>pg-connector</code></td><td>连接器名称，集群内唯一（重名注册返回 409）。出现在 REST 路径与内部配置 topic 的键里，建议只用字母、数字、<code>-</code>、<code>_</code>、<code>.</code>。不在 <code>config</code> 内、无法用 PUT 改名，改名需删后重建，一次定好</td></tr>
-<tr><td><code>connector.class</code></td><td><code>io.debezium.connector.postgresql.PostgresConnector</code></td><td>连接器实现类，PG 固定用这个。可用 <code>GET /connector-plugins</code> 查 Connect 已安装的全部类</td></tr>
-<tr><td><code>topic.prefix</code></td><td><code>pgcdc</code></td><td>数据 topic 前缀，最终 topic 名为 <code>\<topic.prefix\>.\<schema\>.\<表\></code>，本例即 <code>pgcdc.public.orders</code>。集群内所有连接器的前缀必须唯一，否则不同库的数据会混进同一批 topic；旧名 <code>database.server.name</code> 已废弃。不可热更，改了等于换一套 topic，只能删了重建</td></tr>
-<tr><td><code>database.hostname</code></td><td><code>postgres</code></td><td>数据库地址。必须是 Connect <strong>容器内</strong>能解析的地址：源库与 Connect 同一网络用容器名（本例）；跨 Compose/网络用 <code>host.docker.internal</code>（Mac/Win）或共享网络，详见 <a href="#端口与网络">端口与网络</a></td></tr>
-<tr><td><code>database.port</code></td><td><code>5432</code></td><td>数据库端口，默认 5432</td></tr>
-<tr><td><code>database.user</code> / <code>database.password</code></td><td><code>debezium</code> / <code>Admin@123</code></td><td>第二步创建的 CDC 账号</td></tr>
-<tr><td><code>database.dbname</code></td><td><code>shop</code></td><td>要捕获的数据库名。一个连接器只能捕一个库，多库需注册多个连接器</td></tr>
-<tr><td><code>plugin.name</code></td><td><code>pgoutput</code></td><td>逻辑解码插件。可选 <code>pgoutput</code>（PG10+ 内置，2.x 默认，推荐）、<code>decoderbufs</code>（需自行编译装进 PG，老版本用）、<code>wal2json</code>（第三方，输出 JSON）、<code>wal2json-rds</code>/<code>wal2json-streaming</code>（AWS RDS 场景）。没有特殊理由用默认 <code>pgoutput</code> 即可</td></tr>
-<tr><td><code>slot.name</code></td><td><code>debezium_pg_shop</code></td><td>逻辑复制槽名，连接器自动创建并独占。必须全小写、符合 PG 槽命名规则、集群内唯一。默认名是 <code>debezium.database.name</code>，建议显式命名。不可热更；改名前要先用旧名删掉旧槽，否则旧槽残留继续卡 WAL</td></tr>
-<tr><td><code>publication.name</code></td><td><code>dbpublication</code></td><td>pgoutput 模式下的 publication 名，Debezium 启动时按此值查找，不存在才自动创建（默认 <code>dbz_publication</code>）。配了最小权限账号时，需超管预建<strong>同名</strong> publication（见第二步的坑）</td></tr>
-<tr><td><code>table.include.list</code></td><td><code>public.customers</code></td><td>允许捕获的 schema.表，逗号分隔的正则，如 <code>public.customers,public.orders</code> 或 <code>public.*</code>。不在名单里的表不产生任何消息和 topic。可热更（本文验证环节会靠它加新表）</td></tr>
-<tr><td><code>schema.include.list</code></td><td>（未配）</td><td>允许捕获的 schema 白名单。配了 <code>table.include.list</code> 时通常不必再配；不配两个 include.list 时默认捕所有库内 schema（含系统 schema），一般至少配一个收窄范围</td></tr>
-<tr><td><code>decimal.handling.mode</code></td><td><code>string</code></td><td>DECIMAL/NUMERIC 字段编码：<code>precise</code>（默认，<code>\{"scale":1,"value":"ALk="\}</code>，无精度损失但难读）、<code>double</code>（直接是数字，直观但有浮点精度风险）、<code>string</code>（字符串 <code>"18.50"</code>，可读且无精度损失，金额类推荐）。本例选 <code>string</code>，验证消息里 <code>amount</code> 的效果一目了然</td></tr>
-<tr><td><code>topic.creation.default.replication.factor</code></td><td><code>1</code></td><td>自动创建数据 topic 的副本数。可选 <code>1</code>、<code>-1</code>（用 broker 默认）。单节点集群必须填 <code>1</code>，填 <code>-1</code> 时 broker 默认副本数为 3 会建不出来</td></tr>
-<tr><td><code>topic.creation.default.partitions</code></td><td><code>1</code></td><td>自动创建数据 topic 的分区数。可选 <code>1</code>、<code>-1</code>（用 broker 默认 <code>num.partitions</code>）。单节点验证环境填 <code>1</code> 足够；生产按吞吐规划，分区数影响并行度但同 key 仍保序</td></tr>
-</tbody>
+    <colgroup>
+        <col style={{width: '25%' }} />
+        <col style={{width: '25%' }} />
+        <col style={{width: '50%' }} />
+    </colgroup>
+    <thead>
+        <tr>
+            <th>配置项</th>
+            <th>本例取值</th>
+            <th>作用与选值理由</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>name</code></td>
+            <td><code>pg-connector.order_db</code></td>
+            <td>连接器名称，集群内唯一（重名注册返回 409）。出现在 REST 路径与内部配置 topic
+                的键里，建议只用字母、数字、<code>-</code>、<code>_</code>、<code>.</code>。不在 <code>config</code> 内、无法用 PUT
+                改名，改名需删后重建，一次定好</td>
+        </tr>
+        <tr>
+            <td><code>connector.class</code></td>
+            <td><code>io.debezium.connector.postgresql.PostgresConnector</code></td>
+            <td>连接器实现类，PG 固定用这个。可用 <code>GET /connector-plugins</code> 查 Connect 已安装的全部类</td>
+        </tr>
+        <tr>
+            <td><code>topic.prefix</code></td>
+            <td><code>pgcdc.order_db</code></td>
+            <td>数据 topic 前缀，最终 topic 名为 <code>\<topic.prefix\>.\<schema\>.\<表\></code>，本例即
+                <code>pgcdc.order_db.orders</code>。集群内所有连接器的前缀必须唯一，否则不同库的数据会混进同一批 topic；旧名
+                <code>database.server.name</code> 已废弃。不可热更，改了等于换一套 topic，只能删了重建</td>
+        </tr>
+        <tr>
+            <td><code>database.hostname</code></td>
+            <td><code>localhost:5432</code></td>
+            <td>数据库地址。必须是 Connect <strong>容器内</strong>能解析的地址：源库与 Connect 同一网络用容器名（本例）；跨 Compose/网络用
+                <code>host.docker.internal</code>（Mac/Win）或共享网络，详见 <a href="#端口与网络">端口与网络</a></td>
+        </tr>
+        <tr>
+            <td><code>database.port</code></td>
+            <td><code>5432</code></td>
+            <td>数据库端口，默认 5432</td>
+        </tr>
+        <tr>
+            <td><code>database.user</code> / <code>database.password</code></td>
+            <td><code>debezium</code> / <code>debezium@123</code></td>
+            <td>第二步创建的 CDC 账号</td>
+        </tr>
+        <tr>
+            <td><code>database.dbname</code></td>
+            <td><code>order_db</code></td>
+            <td>要捕获的数据库名。一个连接器只能捕一个库，多库需注册多个连接器</td>
+        </tr>
+        <tr>
+            <td><code>plugin.name</code></td>
+            <td><code>pgoutput</code></td>
+            <td>逻辑解码插件。可选 <code>pgoutput</code>（PG10+ 内置，2.x 默认，推荐）、<code>decoderbufs</code>（需自行编译装进
+                PG，老版本用）、<code>wal2json</code>（第三方，输出
+                JSON）、<code>wal2json-rds</code>/<code>wal2json-streaming</code>（AWS RDS 场景）。没有特殊理由用默认
+                <code>pgoutput</code> 即可</td>
+        </tr>
+        <tr>
+            <td><code>slot.name</code></td>
+            <td><code>debezium_pg_order_db</code></td>
+            <td>逻辑复制槽名，连接器自动创建并独占。必须全小写、符合 PG 槽命名规则、集群内唯一。<br />默认名是
+                <code>debezium.database.name</code>，建议显式命名。不可热更；改名前要先用旧名删掉旧槽，否则旧槽残留继续卡 WAL。<br />可以使用 **`SELECT * FROM
+                pg_replication_slots;`** 查看数据库复制槽信息</td>
+        </tr>
+        <tr>
+            <td><code>publication.name</code></td>
+            <td><code>publication.order_db</code></td>
+            <td>pgoutput 模式下的 publication 名，Debezium 启动时按此值查找，不存在才自动创建（默认
+                <code>dbz_publication</code>）。配了最小权限账号时，需超管预建<strong>同名</strong> publication（见第二步的坑）</td>
+        </tr>
+        <tr>
+            <td><code>table.include.list</code></td>
+            <td><code>public.*</code></td>
+            <td>允许捕获的 schema.表，逗号分隔的正则，如 <code>public.customers,public.orders</code> 或
+                <code>public.*</code>。不在名单里的表不产生任何消息和 topic。可热更（本文验证环节会靠它加新表）</td>
+        </tr>
+        <tr>
+            <td><code>schema.include.list</code></td>
+            <td>（未配）</td>
+            <td>允许捕获的 schema 白名单。配了 <code>table.include.list</code> 时通常不必再配；不配两个 include.list 时默认捕所有库内 schema（含系统
+                schema），一般至少配一个收窄范围</td>
+        </tr>
+        <tr>
+            <td><code>decimal.handling.mode</code></td>
+            <td><code>string</code></td>
+            <td>DECIMAL/NUMERIC
+                字段编码：<code>precise</code>（默认，<code>\{"scale":1,"value":"ALk="\}</code>，无精度损失但难读）、<code>double</code>（直接是数字，直观但有浮点精度风险）、<code>string</code>（字符串
+                <code>"18.50"</code>，可读且无精度损失，金额类推荐）。本例选 <code>string</code>，验证消息里 <code>amount</code> 的效果一目了然</td>
+        </tr>
+        <tr>
+            <td><code>topic.creation.default.replication.factor</code></td>
+            <td><code>1</code></td>
+            <td>自动创建数据 topic 的副本数。可选 <code>1</code>、<code>-1</code>（用 broker 默认）。单节点集群必须填 <code>1</code>，填
+                <code>-1</code> 时 broker 默认副本数为 3 会建不出来</td>
+        </tr>
+        <tr>
+            <td><code>topic.creation.default.partitions</code></td>
+            <td><code>1</code></td>
+            <td>自动创建数据 topic 的分区数。可选 <code>1</code>、<code>-1</code>（用 broker 默认 <code>num.partitions</code>）。单节点验证环境填
+                <code>1</code> 足够；生产按吞吐规划，分区数影响并行度但同 key 仍保序</td>
+        </tr>
+    </tbody>
 </table>
 
 后两个 `topic.creation.*` 是本环境（broker 关闭了自动建 topic）让 Debezium 自建数据 topic 的关键，原理见 [数据 topic 不会自动创建](#数据-topic-不会自动创建)。
@@ -215,12 +309,12 @@ $ curl -s http://localhost:8083/connectors/pg-connector/status
   ```bash
   $ ./kafka-topics.sh --bootstrap-server localhost:9092 --list
   $ ./kafka-console-consumer.sh --bootstrap-server localhost:9092 \
-    --topic pgcdc.public.orders --from-beginning
+    --topic pgcdc.order_db.public.orders --from-beginning
   ```
 
   也可以用 Kafbat UI / Kafka Tool 等图形界面直接浏览 topic 和消息。注意只有 `9092` 映射到了宿主机，容器内的 `19092` 宿主机连不上。
 
-- **PostgreSQL**：端口 5432 已映射到宿主机，用 DataGrip、Navicat、DBeaver 等 UI Client 连 `localhost:5432`（账号 `admin` / `admin123`，库 `shop`），建表和增删改都在图形界面里做，本文的 SQL 逐条执行即可。
+- **PostgreSQL**：端口 5432 已映射到宿主机，用 DataGrip、Navicat、DBeaver 等 UI Client 连 `localhost:5432`（账号 `admin` / `admin123`，库 `order_db`），建表和增删改都在图形界面里做，本文的 SQL 逐条执行即可。
 
 :::caution[别在 UI 里长期挂着空闲连接]
 执行 `ALTER DATABASE ... RENAME` 这类需要独占库的操作时，UI Client 里开着的查询标签页会占住连接导致操作失败，先关掉该库的标签页再执行。
@@ -233,12 +327,12 @@ $ curl -s http://localhost:8083/connectors/pg-connector/status
 
 ```bash
 $ docker exec kafka sh -c "/opt/kafka/bin/kafka-console-consumer.sh \
-  --bootstrap-server localhost:19092 --topic pgcdc.public.customers \
+  --bootstrap-server localhost:19092 --topic pgcdc.order_db.public.customers \
   --from-beginning --timeout-ms 4000"
 
-{"before":null,"after":{"id":1,"name":"carol","email":"carol@example.com","updated_at":1786776712383248},"source":{"version":"2.7.3.Final","connector":"postgresql","name":"pgcdc","ts_ms":1786781244954,"snapshot":"first","db":"shop","sequence":"[null,\"29477408\"]","schema":"public","table":"customers","txId":778,"lsn":29477408},"transaction":null,"op":"r","ts_ms":1786781245015}
+{"before":null,"after":{"id":1,"name":"carol","email":"carol@example.com","updated_at":1786776712383248},"source":{"version":"2.7.3.Final","connector":"postgresql","name":"pgcdc.order_db","ts_ms":1786781244954,"snapshot":"first","db":"order_db","sequence":"[null,\"29477408\"]","schema":"public","table":"customers","txId":778,"lsn":29477408},"transaction":null,"op":"r","ts_ms":1786781245015}
 
-{"before":null,"after":{"id":2,"name":"dave1","email":"dave@example.com","updated_at":1786776821575148},"source":{"version":"2.7.3.Final","connector":"postgresql","name":"pgcdc","ts_ms":1786781244954,"snapshot":"last","db":"shop","sequence":"[null,\"29477408\"]","schema":"public","table":"customers","txId":778,"lsn":29477408},"transaction":null,"op":"r","ts_ms":1786781245017}
+{"before":null,"after":{"id":2,"name":"dave1","email":"dave@example.com","updated_at":1786776821575148},"source":{"version":"2.7.3.Final","connector":"postgresql","name":"pgcdc.order_db","ts_ms":1786781244954,"snapshot":"last","db":"order_db","sequence":"[null,\"29477408\"]","schema":"public","table":"customers","txId":778,"lsn":29477408},"transaction":null,"op":"r","ts_ms":1786781245017}
 ```
 
 两行各一条 `op=r` 消息，第一条 `snapshot` 为 `first`、最后一条为 `last`（标记快照边界，中间行为 `true`），快照链路正常。命令里 `--timeout-ms 4000` 是让消费者读完存量后自动退出，避免挂住终端。
@@ -252,7 +346,7 @@ PostgreSQL 连接器只捕获行级数据变更（DML），CREATE/ALTER/DROP 等
 先故意踩一个坑：连接器的 `table.include.list` 目前只有 `public.customers`。现在建一张新表并插入数据：
 
 ```bash
-$ docker exec -i postgres sh -c "psql -U admin -d shop" <<'SQL'
+$ docker exec -i postgres sh -c "psql -U admin -d order_db" <<'SQL'
 CREATE TABLE public.orders (
     id          BIGINT PRIMARY KEY,
     order_no    VARCHAR(32) NOT NULL,
@@ -262,7 +356,7 @@ CREATE TABLE public.orders (
 );
 SQL
 
-$ docker exec postgres sh -c "psql -U admin -d shop -c \
+$ docker exec postgres sh -c "psql -U admin -d order_db -c \
   \"INSERT INTO public.orders(id, order_no, amount, status) VALUES (1001, 'SO-20260815-001', 18.50, 0);\""
 ```
 
@@ -270,10 +364,10 @@ $ docker exec postgres sh -c "psql -U admin -d shop -c \
 
 ```bash
 $ docker exec kafka sh -c "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:19092 --list"
-pgcdc.public.customers
+pgcdc.order_db.public.customers
 ```
 
-`pgcdc.public.orders` 没出现，且 Debezium 日志没有任何报错。原因就是**表不在 `table.include.list` 里**：不在捕获名单的表，数据变更被静默过滤。新建表后必须同步扩大表白名单，这是最容易漏的一步。
+`pgcdc.order_db.public.orders` 没出现，且 Debezium 日志没有任何报错。原因就是**表不在 `table.include.list` 里**：不在捕获名单的表，数据变更被静默过滤。新建表后必须同步扩大表白名单，这是最容易漏的一步。
 
 用 PUT 把新表加进名单（注意 body 必须是完整 config，不能只传改动字段）：
 
@@ -282,7 +376,7 @@ $ curl -s -X PUT http://localhost:8083/connectors/pg-connector/config \
   -H "Content-Type: application/json" \
   -d '{
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-    "topic.prefix": "pgcdc",
+    "topic.prefix": "pgcdc.order_db",
     ...其余配置原样保留...,
     "table.include.list": "public.customers,public.orders"
   }'
@@ -292,17 +386,17 @@ PUT 后连接器自动重启任务。再查 topic：
 
 ```bash
 $ docker exec kafka sh -c "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:19092 --list"
-pgcdc.public.customers
-pgcdc.public.orders
+pgcdc.order_db.public.customers
+pgcdc.order_db.public.orders
 ```
 
 topic 出现了，`topic.creation.*` 生效（副本数 1、分区数 1，按我们配置创建）：
 
 ```bash
 $ docker exec kafka sh -c "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:19092 \
-  --describe --topic pgcdc.public.orders"
+  --describe --topic pgcdc.order_db.public.orders"
 
-Topic: pgcdc.public.orders	PartitionCount: 1	ReplicationFactor: 1
+Topic: pgcdc.order_db.public.orders	PartitionCount: 1	ReplicationFactor: 1
 ```
 
 注意：改白名单前插入的那行数据（把 orders 加入名单之前的历史数据）**不会补发**，名单生效后写入的变更才有消息。
@@ -314,7 +408,7 @@ Topic: pgcdc.public.orders	PartitionCount: 1	ReplicationFactor: 1
 ### 4.3 新增数据：op=c 消息
 
 ```bash
-$ docker exec postgres sh -c "psql -U admin -d shop -c \
+$ docker exec postgres sh -c "psql -U admin -d order_db -c \
   \"INSERT INTO public.orders(id, order_no, amount, status) VALUES (1002, 'SO-20260815-002', 99.90, 0);\""
 ```
 
@@ -322,10 +416,10 @@ $ docker exec postgres sh -c "psql -U admin -d shop -c \
 
 ```bash
 $ docker exec kafka sh -c "/opt/kafka/bin/kafka-console-consumer.sh \
-  --bootstrap-server localhost:19092 --topic pgcdc.public.orders \
+  --bootstrap-server localhost:19092 --topic pgcdc.order_db.public.orders \
   --from-beginning --timeout-ms 4000 --property print.key=true"
 
-{"id":1002}	{"before":null,"after":{"id":1002,"order_no":"SO-20260815-002","amount":"99.90","status":0,"created_at":1786781313038293},"source":{"version":"2.7.3.Final","connector":"postgresql","name":"pgcdc","ts_ms":1786781313038,"snapshot":"false","db":"shop","sequence":"[\"29648056\",\"29648112\"]","schema":"public","table":"orders","txId":781,"lsn":29648112,"xmin":null},"transaction":null,"op":"c","ts_ms":1786781313079}
+{"id":1002}	{"before":null,"after":{"id":1002,"order_no":"SO-20260815-002","amount":"99.90","status":0,"created_at":1786781313038293},"source":{"version":"2.7.3.Final","connector":"postgresql","name":"pgcdc.order_db","ts_ms":1786781313038,"snapshot":"false","db":"order_db","sequence":"[\"29648056\",\"29648112\"]","schema":"public","table":"orders","txId":781,"lsn":29648112,"xmin":null},"transaction":null,"op":"c","ts_ms":1786781313079}
 ```
 
 INSERT 消息的要点：
@@ -338,7 +432,7 @@ INSERT 消息的要点：
 ### 4.4 修改数据：op=u 消息
 
 ```bash
-$ docker exec postgres sh -c "psql -U admin -d shop -c \
+$ docker exec postgres sh -c "psql -U admin -d order_db -c \
   \"UPDATE public.orders SET amount = 128.00, status = 2 WHERE id = 1002;\""
 ```
 
@@ -348,7 +442,7 @@ $ docker exec postgres sh -c "psql -U admin -d shop -c \
 {"id":1002}	{
   "before": null,
   "after": {"id":1002,"order_no":"SO-20260815-002","amount":"128.00","status":2,"created_at":1786781313038293},
-  "source": {"name":"pgcdc","db":"shop","schema":"public","table":"orders","txId":782,"lsn":29648384},
+  "source": {"name":"pgcdc.order_db","db":"order_db","schema":"public","table":"orders","txId":782,"lsn":29648384},
   "op": "u",
   "ts_ms": 1786781325221
 }
@@ -363,7 +457,7 @@ UPDATE 消息的要点：
 ### 4.5 删除数据：op=d 消息与墓碑
 
 ```bash
-$ docker exec postgres sh -c "psql -U admin -d shop -c \"DELETE FROM public.orders WHERE id = 1001;\""
+$ docker exec postgres sh -c "psql -U admin -d order_db -c \"DELETE FROM public.orders WHERE id = 1001;\""
 ```
 
 对应消息（实际是连着的两条）：
@@ -436,12 +530,12 @@ topic 自动按 `<prefix>.<schema>.<表>` 区分，消费时按 schema 选 topic
 [Docker Compose 部署](./Docker%20Compose%20部署.md) 关闭了 broker 自动建 topic。此时两类 topic 表现不同：
 
 - **Connect 内部 topic**（`debezium_configs`/`debezium_offsets`/`debezium_statuses`）：由 Connect 通过管理接口显式创建，不受影响。
-- **Debezium 数据 topic**（`pgcdc.public.orders` 等）：默认**不会**自动创建。broker 关闭自动建、连接器又没配 `topic.creation.*` 时，Debezium 往不存在的 topic 发数据会失败。
+- **Debezium 数据 topic**（`pgcdc.order_db.public.orders` 等）：默认**不会**自动创建。broker 关闭自动建、连接器又没配 `topic.creation.*` 时，Debezium 往不存在的 topic 发数据会失败。
 
 典型现象：连接器状态 `RUNNING`，但数据 topic 一直不出现，Debezium 日志反复报：
 
 ```
-Error while fetching metadata ... {pgcdc.public.orders=UNKNOWN_TOPIC_OR_PARTITION}
+Error while fetching metadata ... {pgcdc.order_db.public.orders=UNKNOWN_TOPIC_OR_PARTITION}
 ```
 
 变更事件发不出去只能缓冲在内存，Postgres 复制槽持续积压（`pg_wal_lsn_diff(pg_current_wal_lsn(), confirmed_flush_lsn)` 不断增大），表现为连接器连着却收不到数据。
@@ -461,7 +555,7 @@ Error while fetching metadata ... {pgcdc.public.orders=UNKNOWN_TOPIC_OR_PARTITIO
 
 ```bash
 $ docker exec kafka sh -c "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:19092 \
-  --create --topic pgcdc.public.orders --partitions 1 --replication-factor 1"
+  --create --topic pgcdc.order_db.public.orders --partitions 1 --replication-factor 1"
 ```
 
 topic 建好后，Debezium 会在约 1 秒内把缓冲事件发出，复制槽积压随之回落。
@@ -542,7 +636,7 @@ Debezium 默认用表主键做消息 key，Kafka 按 key 哈希分区，同一�
 
 | 现象 | 原因 | 解法 |
 | --- | --- | --- |
-| 任务 FAILED：`permission denied for database shop` | PG15+ 最小权限账号无权建 FOR ALL TABLES publication | 超管预建 `CREATE PUBLICATION dbpublication FOR ALL TABLES;` |
+| 任务 FAILED：`permission denied for database order_db` | PG15+ 最小权限账号无权建 FOR ALL TABLES publication | 超管预建 `CREATE PUBLICATION dbpublication FOR ALL TABLES;` |
 | 连接器 RUNNING 但新表无 topic、无消息 | 新表不在 `table.include.list`，被静默过滤 | PUT 扩大白名单（需传完整 config） |
 | 连接器 RUNNING 但无数据 topic、槽积压增长 | broker 关闭自动建、连接器没配 `topic.creation.*` | 连接器配 `topic.creation.default.replication.factor/partitions` |
 | 新加白名单后历史数据没补发 | 白名单只对流式阶段生效 | 需要补数据时执行增量快照（signal 表方式）或重注册 |
@@ -558,19 +652,19 @@ Debezium 默认用表主键做消息 key，Kafka 按 key 哈希分区，同一�
 
 ```json
 {
-  "name": "pg-connector",
+  "name": "pg-connector.库名",
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-    "topic.prefix": "pgcdc",
-    "database.hostname": "postgres",
+    "topic.prefix": "pgcdc.库名",
+    "database.hostname": "host.docker.internal",
     "database.port": "5432",
     "database.user": "debezium",
-    "database.password": "Admin@123",
-    "database.dbname": "shop",
+    "database.password": "debezium@123",
+    "database.dbname": "库名",
     "plugin.name": "pgoutput",
-    "slot.name": "debezium_pg_shop",
-    "publication.name": "dbpublication",
-    "table.include.list": "public.customers,public.orders",
+    "slot.name": "{环境}_{类型}_{用途}_{唯一标识}",
+    "publication.name": "publication.库名",
+    "table.include.list": "public.*",
     "decimal.handling.mode": "string",
     "topic.creation.default.replication.factor": "1",
     "topic.creation.default.partitions": "1"
