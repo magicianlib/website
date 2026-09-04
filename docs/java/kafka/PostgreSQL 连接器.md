@@ -47,25 +47,37 @@ $ docker exec postgres sh -c "psql -U admin -d order_db -c 'SHOW wal_level;'"
 看到 `logical` 即可继续；如果是 `replica`，说明配置没生效，先回去检查配置文件挂载，不要急着注册连接器。
 
 :::warning[槽会阻止 WAL 清理]
-复制槽会保留住未消费的 WAL，连接器长期停用时槽里的 WAL 越积越多，磁盘会被撑满。停用一个连接器后如果确定不再用，记得删掉对应槽：`SELECT pg_drop_replication_slot('槽名');`
+复制槽会保留住未消费的 WAL，连接器长期停用时槽里的 WAL 越积越多，磁盘会被撑满。停用一个连接器后如果确定不再用，记得删掉对应槽：
+
+```sql
+-- 查看已创建槽信息
+SELECT * FROM pg_replication_slots;
+
+-- 删除指定槽
+SELECT pg_drop_replication_slot(slot_name);
+```
 :::
 
-其他要点：
+**其他要点：**
 
-- **逻辑解码插件**：Debezium 2.x 默认用 PostgreSQL 内置的 `pgoutput`（PG10+ 自带，无需额外安装）。老教程里的 `decoderbufs` 需要自行编译安装，官方 postgres 镜像里没有，用默认的 `pgoutput` 即可。
-- **REPLICA IDENTITY**：默认 `DEFAULT`，UPDATE/DELETE 消息的 `before` 只有主键列。要完整旧值镜像需表级设置 `ALTER TABLE 表名 REPLICA IDENTITY FULL`（本文验证用的 `customers` 表已设置，`orders` 表没有，正好对比两种行为）。
+- **逻辑解码插件**：**Debezium 2.x 默认用 PostgreSQL 内置的 `pgoutput`（PG10+ 自带，无需额外安装）**。老教程里的 `decoderbufs` 需要自行编译安装，官方 postgres 镜像里没有，用默认的 `pgoutput` 即可。
+- **`REPLICA IDENTITY`**：**默认 `DEFAULT`，UPDATE/DELETE 消息的 `before` 只有主键列**。要完整旧值镜像需表级设置 `ALTER TABLE 表名 REPLICA IDENTITY FULL`（本文验证用的 `customers` 表已设置，`orders` 表没有，正好对比两种行为）。
 - **主键**：被捕获的表必须有主键。无主键时消息没有稳定 key，变更散落到不同分区，顺序无法保证。
 
 ## 第二步：创建最小权限账号
 
-连接器需要一个具备逻辑复制权限的账号。本地调试可以直接用超管账号（具备隐式复制权限），但生产环境务必用下面的最小权限账号。
+连接器需要一个具备逻辑复制权限的账号。**本地调试可以直接用超管账号（具备隐式复制权限），但生产环境务必用下面的最小权限账号**。
 
 在目标数据库里执行（`psql` 必须先进入库 `\c order_db` 或 `psql -d order_db`，权限类语句不能用 `库名.schema` 形式跨库执行）：
 
 ```sql
 BEGIN;
 
--- 创建用于 CDC 的登录账号，必须具备逻辑复制权限
+-- 单独创建一个用于 CDC 的登录账号
+-- 账号必须具备逻辑复制权限(REPLICATION)
+-- CREATE ROLE 账号 WITH REPLICATION LOGIN PASSWORD '密码';
+--
+-- 演示账号/密码: debezium/debezium@123
 CREATE ROLE debezium WITH REPLICATION LOGIN PASSWORD 'debezium@123';
 
 -- 允许连接到目标数据库(以 order_db 为例)
@@ -85,14 +97,16 @@ COMMIT;
 
 逐条说明：
 
-- `REPLICATION`：允许创建复制槽、建立逻辑复制连接，这是 CDC 的核心权限，没有它连接器起不来。
+- `CREATE ROLE .. WITH REPLICATION`：允许创建复制槽、建立逻辑复制连接，这是 CDC 的核心权限，没有它连接器起不来。
 - `GRANT CONNECT ON DATABASE`：账号能连上这个库。
-- `GRANT USAGE ON SCHEMA`：能访问 schema 里的对象；没有它，即使表有 SELECT 权限也读不了。
+- `GRANT USAGE ON SCHEMA`：能访问 schema 里的对象。没有它，即使表有 SELECT 权限也读不了。
 - `GRANT SELECT ON ALL TABLES`：快照阶段要全表读取存量数据。
-- `ALTER DEFAULT PRIVILEGES`：让以后新建的表自动继承 SELECT 权限，省得每建一张表就补一次授权。注意它只对「执行这条语句之后该角色新建的表」生效，已存在的表仍需上一条 `GRANT SELECT` 覆盖。
+- `ALTER DEFAULT PRIVILEGES`：让以后新建的表自动继承 SELECT 权限，省得每建一张表就补一次授权。注意它只对**执行这条语句之后该角色新建的表**生效，已存在的表仍需上一条 `GRANT SELECT` 覆盖。
 
 :::danger[PG15+ 还差一步]
-PostgreSQL 15 起，对数据库执行 `CREATE PUBLICATION ... FOR ALL TABLES` 需要超管权限，最小权限账号没有。而 Debezium 首次启动时会尝试自动创建 publication，于是任务直接 FAILED，日志报 `permission denied for database order_db`。解决办法是用超管**预建**同名 publication（连接器看到已存在就不再创建，只会校验和复用）：
+PostgreSQL 15 起，对数据库执行 `CREATE PUBLICATION ... FOR ALL TABLES` 需要超管权限，最小权限账号没有。而 Debezium 首次启动时会尝试自动创建 publication，于是任务直接 FAILED，日志报 `permission denied for database order_db`。
+
+解决办法是用超管**预建**同名 publication（连接器看到已存在就不再创建，只会校验和复用）：
 
 ```sql
 -- 用超管账号（本环境为 admin）在目标库执行
@@ -109,9 +123,9 @@ SELECT * FROM pg_publication;
 
 ```
 
-`publication.order_db` 是自定义名字（<u>**库内唯一即可**</u>），但<u>**必须与第三步连接器配置里的 `publication.name` 完全一致**</u>：Debezium 启动时按 `publication.name` 的值去数据库找 publication，找到就复用，找不到才尝试创建。名字对不上时预建等于白建，连接器还是会因权限不足而失败。
+`publication.order_db` 是自定义名字（<u>**库内唯一即可**</u>），但**必须与第三步连接器配置里的 `publication.name` 完全一致**：Debezium 启动时按 `publication.name` 的值去数据库找 publication，找到就复用，找不到才尝试创建。名字对不上时预建等于白建，连接器还是会因权限不足而失败。
 
-这是 PG15+ 最小权限方案下必踩的坑，本文注册连接器前会先执行它。
+**这是 PG15+ 最小权限方案下必踩的坑，本文注册连接器前会先执行它。**
 :::
 
 ## 第三步：注册连接器
@@ -132,7 +146,7 @@ SELECT * FROM pg_publication;
     "plugin.name": "pgoutput",
     "slot.name": "debezium_pg_order_db",
     "publication.name": "publication.order_db",
-    "table.include.list": "public.*",
+    "table.include.list": "public.customers",
     "decimal.handling.mode": "string",
     "topic.creation.default.replication.factor": "1",
     "topic.creation.default.partitions": "1"
@@ -209,8 +223,7 @@ $ curl -s http://localhost:8083/connectors/pg-connector/status
         <tr>
             <td><code>topic.prefix</code></td>
             <td><code>pgcdc.order_db</code></td>
-            <td>数据 topic 前缀，最终 topic 名为 <code>\<topic.prefix\>.\<schema\>.\<表\></code>，本例即
-                <code>pgcdc.order_db.orders</code>。集群内所有连接器的前缀必须唯一，否则不同库的数据会混进同一批 topic；旧名
+            <td>数据 topic 前缀，最终 topic 名为 <code>\<topic.prefix\>.\<schema\>.\<表\></code>。集群内所有连接器的前缀必须唯一，否则不同库的数据会混进同一批 topic。<br/>旧名
                 <code>database.server.name</code> 已废弃。不可热更，改了等于换一套 topic，只能删了重建</td>
         </tr>
         <tr>
@@ -257,7 +270,7 @@ $ curl -s http://localhost:8083/connectors/pg-connector/status
         </tr>
         <tr>
             <td><code>table.include.list</code></td>
-            <td><code>public.*</code></td>
+            <td><code>public.customers</code></td>
             <td>允许捕获的 schema.表，逗号分隔的正则，如 <code>public.customers,public.orders</code> 或
                 <code>public.*</code>。不在名单里的表不产生任何消息和 topic。可热更（本文验证环节会靠它加新表）</td>
         </tr>
@@ -367,7 +380,7 @@ $ docker exec kafka sh -c "/opt/kafka/bin/kafka-topics.sh --bootstrap-server loc
 pgcdc.order_db.public.customers
 ```
 
-`pgcdc.order_db.public.orders` 没出现，且 Debezium 日志没有任何报错。原因就是**表不在 `table.include.list` 里**：不在捕获名单的表，数据变更被静默过滤。新建表后必须同步扩大表白名单，这是最容易漏的一步。
+`pgcdc.order_db.public.orders` 没出现，且 Debezium 日志没有任何报错。原因就是**表不在 `table.include.list` 里**：不在捕获名单的表，数据变更被静默过滤。新建表可按需扩大表白名单，因为并不是所有表都需要做数据同步。
 
 用 PUT 把新表加进名单（注意 body 必须是完整 config，不能只传改动字段）：
 
@@ -399,9 +412,9 @@ $ docker exec kafka sh -c "/opt/kafka/bin/kafka-topics.sh --bootstrap-server loc
 Topic: pgcdc.order_db.public.orders	PartitionCount: 1	ReplicationFactor: 1
 ```
 
-注意：改白名单前插入的那行数据（把 orders 加入名单之前的历史数据）**不会补发**，名单生效后写入的变更才有消息。
+**注意：** 改白名单前插入的那行数据（把 orders 加入名单之前的历史数据）**不会补发**，名单生效后写入的变更才有消息。
 
-:::note[关于 publication 与 FOR ALL TABLES]
+:::tip[关于 publication 与 FOR ALL TABLES]
 第二步预建的 publication 是 `FOR ALL TABLES`，新建表自动纳入，无需手工 `ALTER PUBLICATION ... ADD TABLE`。反过来，FOR ALL TABLES 的 publication 也不允许 ADD/DROP TABLE（会报 `publication is defined as FOR ALL TABLES`），要么全靠自动，要么改用显式表清单的 publication 并在建表后手工维护。
 :::
 
@@ -508,7 +521,9 @@ topic 自动按 `<prefix>.<schema>.<表>` 区分，消费时按 schema 选 topic
 
 ### 去掉每条消息的 schema 块
 
-默认情况下每条消息外层带一个 `schema` 字段，重复描述整张表的结构（字段名、类型、是否可空等），与业务无关却占消息体绝大部分，单条可从几百字节膨胀到 3KB 以上。上面验证能直接看到可读 JSON，是因为 Compose 里已设置 `CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE=false`（注意 `debezium/connect` 镜像只识别 `CONNECT_` 前缀的变量）。关闭后新消息只剩 payload，体积降到原来的数分之一。已落盘的旧消息仍是旧格式。
+默认情况下每条消息外层带一个 `schema` 字段，重复描述整张表的结构（字段名、类型、是否可空等），与业务无关却占消息体绝大部分，单条可从几百字节膨胀到 3KB 以上。
+
+上面验证能直接看到可读 JSON，是因为 Compose 里已设置 `CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE=false`（注意 `debezium/connect` 镜像只识别 `CONNECT_` 前缀的变量）。关闭后新消息只剩 payload，体积降到原来的数分之一。已落盘的旧消息仍是旧格式。
 
 ### DECIMAL 字段编码
 
@@ -657,14 +672,14 @@ Debezium 默认用表主键做消息 key，Kafka 按 key 哈希分区，同一�
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
     "topic.prefix": "pgcdc.库名",
     "database.hostname": "host.docker.internal",
-    "database.port": "5432",
-    "database.user": "debezium",
-    "database.password": "debezium@123",
+    "database.port": "端口(默认5432)",
+    "database.user": "账号",
+    "database.password": "密码",
     "database.dbname": "库名",
     "plugin.name": "pgoutput",
     "slot.name": "{环境}_{类型}_{用途}_{唯一标识}",
     "publication.name": "publication.库名",
-    "table.include.list": "public.*",
+    "table.include.list": "按需配置表白名单(如 public.table1,public.table2), 也可以直接 public.*",
     "decimal.handling.mode": "string",
     "topic.creation.default.replication.factor": "1",
     "topic.creation.default.partitions": "1"
